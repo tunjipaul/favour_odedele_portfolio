@@ -1,1 +1,175 @@
 @import "tailwindcss";
+
+@theme {
+  --color-primary: #556b2f;
+  --color-primary-dark: #4a5d28;
+  --color-background-light: #fdfdfb;
+  --color-background-muted: #f4f4f0;
+  --color-background-dark: #1a1d14;
+  --color-accent-green: #22c55e;
+  --color-accent-magenta: #d946ef;
+
+  --font-display: "Public Sans", sans-serif;
+  --font-serif: "Playfair Display", serif;
+
+  --radius-DEFAULT: 0.25rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-2xl: 1rem;
+  --radius-3xl: 1.5rem;
+  --radius-full: 9999px;
+}
+
+/* Base styles */
+body {
+  font-family: var(--font-display);
+  background-color: var(--color-background-light);
+  color: #0f172a;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Geometric dot background pattern */
+.geometric-bg {
+  background-image: radial-gradient(
+    circle at 2px 2px,
+    rgba(85, 107, 47, 0.05) 1px,
+    transparent 0
+  );
+  background-size: 24px 24px;
+}
+
+/* Masonry layout for gallery */
+.masonry {
+  column-count: 2;
+  column-gap: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .masonry {
+    column-gap: 1rem;
+  }
+}
+
+@media (min-width: 768px) {
+  .masonry {
+    column-count: 3;
+  }
+}
+
+.masonry-item {
+  break-inside: avoid;
+  margin-bottom: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .masonry-item {
+    margin-bottom: 1rem;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-background-muted);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-primary);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-primary-dark);
+}
+
+/* Scroll Reveal Animations */
+.reveal-element {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+}
+
+.reveal-element.reveal-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Icon pop animation */
+.reveal-icon {
+  transform: scale(0) translateY(0);
+  transition: opacity 0.4s ease-out, transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.reveal-icon.reveal-visible {
+  transform: scale(1) translateY(0);
+}
+
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  .reveal-element,
+  .reveal-icon {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* Book Opening Animation */
+@keyframes bookOpen {
+  0% {
+    transform: scale(1) rotateY(0deg);
+  }
+  40% {
+    transform: scale(1.2) rotateY(5deg);
+  }
+  70% {
+    transform: scale(1.5) rotateY(15deg);
+  }
+  100% {
+    transform: scale(2) rotateY(30deg);
+  }
+}
+
+.book-opening {
+  animation: bookOpen 2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+
+/* Custom duration utility */
+.duration-2000 {
+  transition-duration: 2000ms;
+}
+
+/* Blinking cursor for typewriter */
+@keyframes blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+.animate-blink {
+  animation: blink 0.7s step-end infinite;
+}
+
+/* Infinite loading bar — sweeps left to right endlessly */
+@keyframes loadingBar {
+  0% { left: -33%; }
+  100% { left: 100%; }
+}
+
+.animate-loading-bar {
+  animation: loadingBar 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+/* Shimmer glow sweeping across progress bar */
+@keyframes shimmer {
+  0% { left: -60px; opacity: 0.6; }
+  80% { opacity: 0.6; }
+  100% { left: 100%; opacity: 0; }
+}
+
+.animate-shimmer {
+  animation: shimmer 1.4s ease-in-out infinite;
+}
