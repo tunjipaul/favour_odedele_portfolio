@@ -15,14 +15,28 @@ const app = express();
 // ─── Middleware (runs on EVERY request before routes) ───────────────────────
 // These are like FastAPI's app.add_middleware() calls
 
-// CORS: Allows requests from the frontend origin
-// Without this, browsers block cross-origin API calls (security feature)
+// CORS: Allows requests from defined origins
+const allowedOrigins = [
+  'http://localhost:5173',
+  'http://localhost:5174',
+  process.env.FRONTEND_URL,
+].filter(Boolean);
+
 app.use(cors({
-  origin: [
-    'http://localhost:5173',   // Vite frontend dev server
-    'http://localhost:5174',   // Admin panel dev server
-    process.env.FRONTEND_URL, // Production frontend URL (set in .env later)
-  ],
+  origin: (origin, callback) => {
+    // Allow requests with no origin (like mobile apps or curl)
+    if (!origin) return callback(null, true);
+    
+    // Check if the current request origin is allowed
+    const isAllowed = allowedOrigins.some(ao => ao === origin || ao === `${origin}/`);
+    
+    if (isAllowed) {
+      callback(null, true);
+    } else {
+      console.warn(`Origin block: ${origin} (Allowed: ${allowedOrigins.join(', ')})`);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   credentials: true,
 }));
 
