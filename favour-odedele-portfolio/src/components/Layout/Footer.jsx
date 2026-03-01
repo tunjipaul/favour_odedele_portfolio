@@ -158,7 +158,7 @@ export default function Footer() {
             <div className="w-8 h-8 bg-slate-400 rounded flex items-center justify-center text-white">
               <Star className="w-4 h-4 fill-current" />
             </div>
-            <span className="font-black uppercase tracking-widest text-xs group cursor-default">
+            <span className="font-black uppercase tracking-widest text-xs group cursor-default text-center">
               <span className="transition-colors duration-300 hover:text-primary">Favor</span>
               {' '}
               <span className="transition-colors duration-300 hover:text-accent-magenta">Odedele</span>
