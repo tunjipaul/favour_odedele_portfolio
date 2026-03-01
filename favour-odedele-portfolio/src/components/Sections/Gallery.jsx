@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { galleryItems as fallbackItems } from '../../data/projects';
+import { API_BASE_URL } from '../../config.js';
 
-const API = 'http://localhost:5000/api';
+const API = API_BASE_URL;
 
 const accentColorMap = {
   'primary': 'bg-primary/40',

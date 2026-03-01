@@ -2,6 +2,9 @@ import { BookOpen } from 'lucide-react';
 import useStore from '../../store/useStore';
 import Modal from '../UI/Modal';
 import { useState, useEffect, useRef } from 'react';
+import { API_BASE_URL } from '../../config.js';
+
+const API = API_BASE_URL;
 
 const STATS = [
   { label: 'Days Left', target: 45 },

@@ -34,6 +34,7 @@ export const login = async (req, res) => {
       token, // Frontend stores this in localStorage
     });
   } catch (error) {
+    console.error('AuthController.login error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };

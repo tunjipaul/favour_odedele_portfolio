@@ -21,6 +21,7 @@ import MetricsEditor from './admin/pages/MetricsEditor';
 import ExpertiseEditor from './admin/pages/ExpertiseEditor';
 import SettingsEditor from './admin/pages/SettingsEditor';
 import WaitlistViewer from './admin/pages/WaitlistViewer';
+import FrontPageEditor from './admin/pages/FrontPageEditor';
 
 // ProtectedRoute — redirects to /admin/login if not authenticated
 function ProtectedRoute({ children }) {
@@ -63,12 +64,13 @@ export default function App() {
       >
         <Route index element={<Navigate to="/admin/dashboard" replace />} />
         <Route path="dashboard" element={<Dashboard />} />
-        <Route path="projects" element={<ProjectsManager />} />
-        <Route path="gallery" element={<GalleryManager />} />
-        <Route path="metrics" element={<MetricsEditor />} />
+        <Route path="front-page" element={<FrontPageEditor />} />
         <Route path="expertise" element={<ExpertiseEditor />} />
-        <Route path="settings" element={<SettingsEditor />} />
+        <Route path="metrics" element={<MetricsEditor />} />
+        <Route path="projects" element={<ProjectsManager />} />
         <Route path="waitlist" element={<WaitlistViewer />} />
+        <Route path="gallery" element={<GalleryManager />} />
+        <Route path="settings" element={<SettingsEditor />} />
       </Route>
 
       {/* ── Catch-all ────────────────────────────── */}

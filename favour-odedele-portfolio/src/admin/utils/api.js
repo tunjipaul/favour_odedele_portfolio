@@ -1,5 +1,7 @@
+import { API_BASE_URL } from '../../config.js';
+
 // Central API base URL — change this one line when deploying to production
-const BASE_URL = 'http://localhost:5000/api';
+const BASE_URL = API_BASE_URL;
 
 // Helper to get the stored JWT token
 const getToken = () => localStorage.getItem('adminToken');
@@ -7,13 +9,21 @@ const getToken = () => localStorage.getItem('adminToken');
 // Core request function — wraps fetch with auth headers automatically
 const request = async (endpoint, options = {}) => {
   const token = getToken();
+  const isFormData = options.body instanceof FormData;
+
+  const mergedHeaders = {
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    ...options.headers,
+  };
+
+  if (!isFormData) {
+    mergedHeaders['Content-Type'] = mergedHeaders['Content-Type'] || 'application/json';
+  } else if ('Content-Type' in mergedHeaders) {
+    delete mergedHeaders['Content-Type'];
+  }
 
   const config = {
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-      ...options.headers,
-    },
+    headers: mergedHeaders,
     ...options,
   };
 
@@ -53,7 +63,6 @@ export const api = {
     request(endpoint, {
       method: 'POST',
       body: formData,
-      headers: { Authorization: `Bearer ${getToken()}` }, // Override default headers
     }),
 };
 

@@ -10,6 +10,7 @@ export const getMetrics = async (req, res) => {
     const metrics = await Metric.find().sort({ order: 1 });
     res.json(metrics);
   } catch (error) {
+    console.error('ContentController.getMetrics error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
@@ -34,6 +35,7 @@ export const getExpertise = async (req, res) => {
     const pillars = await ExpertisePillar.find({ isVisible: true }).sort({ order: 1 });
     res.json(pillars);
   } catch (error) {
+    console.error('ContentController.getExpertise error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
@@ -43,6 +45,7 @@ export const getAllExpertise = async (req, res) => {
     const pillars = await ExpertisePillar.find().sort({ order: 1 });
     res.json(pillars);
   } catch (error) {
+    console.error('ContentController.getAllExpertise error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
@@ -52,6 +55,7 @@ export const createExpertisePillar = async (req, res) => {
     const pillar = await ExpertisePillar.create(req.body);
     res.status(201).json(pillar);
   } catch (error) {
+    console.error('ContentController.createExpertisePillar error:', error);
     res.status(400).json({ message: 'Validation error', error: error.message });
   }
 };
@@ -65,6 +69,7 @@ export const updateExpertisePillar = async (req, res) => {
     if (!pillar) return res.status(404).json({ message: 'Pillar not found' });
     res.json(pillar);
   } catch (error) {
+    console.error('ContentController.updateExpertisePillar error:', error);
     res.status(400).json({ message: 'Update error', error: error.message });
   }
 };
@@ -75,6 +80,7 @@ export const deleteExpertisePillar = async (req, res) => {
     if (!pillar) return res.status(404).json({ message: 'Pillar not found' });
     res.json({ message: 'Pillar deleted successfully' });
   } catch (error) {
+    console.error('ContentController.deleteExpertisePillar error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
@@ -93,6 +99,7 @@ export const getSettings = async (req, res) => {
     }
     res.json(settings);
   } catch (error) {
+    console.error('ContentController.getSettings error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
@@ -114,6 +121,7 @@ export const updateSettings = async (req, res) => {
     }
     res.json(settings);
   } catch (error) {
+    console.error('ContentController.updateSettings error:', error);
     res.status(400).json({ message: 'Update error', error: error.message });
   }
 };
@@ -135,6 +143,7 @@ export const joinWaitlist = async (req, res) => {
     const entry = await WaitlistEntry.create({ email, name });
     res.status(201).json({ message: "You're on the waitlist!", entry });
   } catch (error) {
+    console.error('ContentController.joinWaitlist error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
@@ -145,6 +154,7 @@ export const getWaitlist = async (req, res) => {
     const entries = await WaitlistEntry.find().sort({ createdAt: -1 });
     res.json(entries);
   } catch (error) {
+    console.error('ContentController.getWaitlist error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };

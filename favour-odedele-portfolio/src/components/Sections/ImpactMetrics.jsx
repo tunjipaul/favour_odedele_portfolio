@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
+import { API_BASE_URL } from '../../config.js';
 
-const API = 'http://localhost:5000/api';
+const API = API_BASE_URL;
 
 // Fallback data — shown if the API is unreachable
 const fallbackMetrics = [
@@ -16,16 +17,22 @@ export default function ImpactMetrics() {
   const sectionRef = useRef(null);
   const numberRefs = useRef([]);
   const [metrics, setMetrics] = useState(fallbackMetrics); // fallback until API responds
-  const [counts, setCounts] = useState([0, 0, 0]);
+  const [counts, setCounts] = useState(fallbackMetrics.map(() => 0));
   const [hasAnimated, setHasAnimated] = useState(false);
-  const [showValues, setShowValues] = useState([false, false, false]);
+  const [showValues, setShowValues] = useState(fallbackMetrics.map(() => false));
 
   // Fetch live metrics — falls back to hardcoded if API is unreachable
   useEffect(() => {
     fetch(`${API}/metrics`)
       .then((res) => res.json())
-      .then((data) => { if (Array.isArray(data) && data.length) setMetrics(data); })
-      .catch(() => {});
+      .then((data) => { 
+        if (Array.isArray(data) && data.length) {
+          setMetrics(data);
+          setCounts(data.map(() => 0));
+          setShowValues(data.map(() => false));
+        } 
+      })
+      .catch((err) => console.error('Failed to fetch metrics', err));
   }, []);
 
   useEffect(() => {
@@ -48,7 +55,7 @@ export default function ImpactMetrics() {
     }
 
     return () => observer.disconnect();
-  }, [hasAnimated]);
+  }, [hasAnimated, metrics]); // re-run if metrics change before animation
 
   const startAnimation = () => {
     // Stage 1: Fade in numbers 01, 02, 03 with stagger
@@ -60,15 +67,15 @@ export default function ImpactMetrics() {
       }
     });
 
-    // Stage 2: Show "Multi" first (after all numbers are visible)
+    // Stage 2: Show static values first (metrics where targetValue is null)
     setTimeout(() => {
-      setShowValues([false, false, true]); // Show "Multi" immediately
-    }, 600); // After 01, 02, 03 are visible
+      setShowValues(prev => prev.map((val, idx) => metrics[idx].targetValue === null ? true : val));
+    }, 600);
 
-    // Stage 3: Start counting for 10k+ and 20+ (after Multi appears)
+    // Stage 3: Start counting for dynamic values
     setTimeout(() => {
       animateCounters();
-    }, 900); // 300ms after Multi appears
+    }, 900);
   };
 
   const animateCounters = () => {
@@ -81,15 +88,14 @@ export default function ImpactMetrics() {
       frame++;
       const progress = easeOutQuart(frame / totalFrames);
 
-      setCounts([
-        Math.round(progress * metrics[0].targetValue), // 10000
-        Math.round(progress * metrics[1].targetValue), // 20
-        0, // Multi doesn't count
-      ]);
+      setCounts(metrics.map((m, idx) => {
+        if (m.targetValue === null) return 0;
+        return Math.round(progress * m.targetValue);
+      }));
 
       // Show values as they start counting
       if (frame === 1) {
-        setShowValues([true, true, true]);
+        setShowValues(metrics.map(() => true));
       }
 
       if (frame === totalFrames) {
@@ -100,24 +106,33 @@ export default function ImpactMetrics() {
 
   const formatValue = (index) => {
     if (!showValues[index]) return '';
+    const metric = metrics[index];
+    if (!metric) return '';
 
-    if (index === 0) {
-      // 10k+ format
-      const val = counts[0];
-      if (val >= 10000) return '10k+';
-      if (val >= 1000) return `${Math.floor(val / 1000)}k+`;
-      return `${val}+`;
-    } else if (index === 1) {
-      // 20+ format
-      return `${counts[1]}+`;
-    } else {
-      // Multi - static text
-      return 'Multi';
+    // If static text
+    if (metric.targetValue === null || metric.targetValue === undefined) {
+      return metric.value;
     }
+
+    const val = counts[index];
+    const target = metric.targetValue;
+    
+    // If finished, show the display value from DB (which might have "+" or "k")
+    if (val >= target) return metric.value;
+
+    // During animation, try to be smart about the suffix
+    const suffix = metric.value.replace(/[0-9]/g, '');
+    
+    if (metric.value.toLowerCase().includes('k')) {
+      if (val >= 1000) return `${Math.floor(val / 1000)}k${suffix.replace('k', '')}`;
+      return `${val}${suffix.replace('k', '')}`;
+    }
+
+    return `${val}${suffix}`;
   };
 
   return (
-    <section ref={sectionRef} className="py-8 sm:py-10 md:py-12 bg-primary-dark" id="impact">
+    <section ref={sectionRef} className="py-6 sm:py-8 bg-primary-dark" id="impact">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-10 md:gap-12 text-white">
         {metrics.map((metric, index) => (
           <div

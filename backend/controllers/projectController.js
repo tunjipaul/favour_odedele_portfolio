@@ -8,6 +8,7 @@ export const getProjects = async (req, res) => {
     const projects = await Project.find({ isVisible: true }).sort({ order: 1 });
     res.json(projects);
   } catch (error) {
+    console.error('ProjectController.getProjects error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
@@ -20,6 +21,7 @@ export const getAllProjects = async (req, res) => {
     const projects = await Project.find().sort({ order: 1 });
     res.json(projects);
   } catch (error) {
+    console.error('ProjectController.getAllProjects error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
@@ -30,6 +32,7 @@ export const createProject = async (req, res) => {
     const project = await Project.create(req.body);
     res.status(201).json(project);
   } catch (error) {
+    console.error('ProjectController.createProject error:', error);
     res.status(400).json({ message: 'Validation error', error: error.message });
   }
 };
@@ -45,6 +48,7 @@ export const updateProject = async (req, res) => {
     if (!project) return res.status(404).json({ message: 'Project not found' });
     res.json(project);
   } catch (error) {
+    console.error('ProjectController.updateProject error:', error);
     res.status(400).json({ message: 'Update error', error: error.message });
   }
 };
@@ -56,6 +60,7 @@ export const deleteProject = async (req, res) => {
     if (!project) return res.status(404).json({ message: 'Project not found' });
     res.json({ message: 'Project deleted successfully' });
   } catch (error) {
+    console.error('ProjectController.deleteProject error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };

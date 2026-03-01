@@ -1,11 +1,19 @@
 import { useEffect, useState } from 'react';
+import { API_BASE_URL } from '../../config.js';
 
-const FULL_NAME = 'FAVOR ODEDELE';
-const BIO_TEXT = 'Programs Manager specializing in Education, Entrepreneurship, and Human Capacity Development.';
+const FALLBACK_NAME = 'FAVOR ODEDELE';
+const FALLBACK_BIO = 'Programs Manager specializing in Education, Entrepreneurship, and Human Capacity Development.';
+const FALLBACK_PORTRAIT = '/images/placeholder-hero.jpg';
+
 // Colors cycling per letter: army green, navy blue, purple
 const LETTER_COLORS = ['#556b2f', '#1e3a5f', '#7c3aed'];
 
 export default function Hero() {
+  const [settings, setSettings] = useState({ 
+    fullName: FALLBACK_NAME, 
+    bioText: FALLBACK_BIO, 
+    portrait: FALLBACK_PORTRAIT 
+  });
   const [cardVisible, setCardVisible] = useState(false);
   const [typedCount, setTypedCount] = useState(0);
   const [cycleIndex, setCycleIndex] = useState(0);
@@ -14,7 +22,19 @@ export default function Hero() {
 
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);
-    if (element) element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (element) {
+      const header = document.querySelector('header');
+      const offset = header ? header.offsetHeight : 0;
+      const bodyRect = document.body.getBoundingClientRect().top;
+      const elementRect = element.getBoundingClientRect().top;
+      const elementPosition = elementRect - bodyRect;
+      const offsetPosition = elementPosition - offset;
+
+      window.scrollTo({
+        top: offsetPosition,
+        behavior: 'smooth'
+      });
+    }
   };
 
   const dotPattern = {
@@ -23,53 +43,75 @@ export default function Hero() {
   };
 
   useEffect(() => {
+    // Fetch settings from backend
+    const fetchSettings = async () => {
+      try {
+        const response = await fetch(`${API_BASE_URL}/settings`);
+        const data = await response.json();
+        if (data?.hero) {
+          setSettings({
+            fullName: data.hero.fullName || FALLBACK_NAME,
+            bioText: data.hero.bioText || FALLBACK_BIO,
+            portrait: data.hero.portrait || FALLBACK_PORTRAIT
+          });
+        }
+      } catch (err) {
+        console.error('Failed to fetch hero settings', err);
+      }
+    };
+    fetchSettings();
+
     // Step 1: card slides in after 200ms
     const cardTimer = setTimeout(() => setCardVisible(true), 200);
     return () => clearTimeout(cardTimer);
   }, []);
 
+  const fullName = settings.fullName.toUpperCase();
+  const bioText = settings.bioText;
+
   useEffect(() => {
     if (!cardVisible) return;
     // Step 2: start typing letters after card appears (600ms delay)
-    if (typedCount < FULL_NAME.length) {
+    if (typedCount < fullName.length) {
       const t = setTimeout(() => setTypedCount((c) => c + 1), typedCount === 0 ? 600 : 80);
       return () => clearTimeout(t);
     }
-  }, [cardVisible, typedCount]);
+  }, [cardVisible, typedCount, fullName.length]);
 
   useEffect(() => {
-    if (typedCount < FULL_NAME.length) return;
+    if (typedCount < fullName.length) return;
     // Step 3: after name done, cycle colors every 800ms
     const t = setInterval(() => setCycleIndex((i) => i + 1), 800);
     // Step 4: start bio slide-in + typewriter after a short pause
     const bioDelay = setTimeout(() => setBioVisible(true), 300);
     return () => { clearInterval(t); clearTimeout(bioDelay); };
-  }, [typedCount]);
+  }, [typedCount, fullName.length]);
 
   useEffect(() => {
     if (!bioVisible) return;
-    if (bioCount < BIO_TEXT.length) {
+    if (bioCount < bioText.length) {
       const t = setTimeout(() => setBioCount((c) => c + 1), 40); // slow: 40ms per char
       return () => clearTimeout(t);
     }
-  }, [bioVisible, bioCount]);
+  }, [bioVisible, bioCount, bioText.length]);
 
   // Assign a color to each letter based on its index + cycleIndex
   const getLetterColor = (i) => {
-    if (FULL_NAME[i] === ' ') return 'transparent';
+    if (fullName[i] === ' ') return 'transparent';
     return LETTER_COLORS[(i + cycleIndex) % LETTER_COLORS.length];
   };
 
-  const renderName = () =>
-    FULL_NAME.split('').map((char, i) => {
-      const visible = i < typedCount;
-      if (char === ' ') return <span key={i} className="inline-block w-4" />;
+  // Helper to render a specific part of the name with typing/color effects
+  const renderNameLine = (lineText, startIndex) =>
+    lineText.split('').map((char, i) => {
+      const globalIdx = startIndex + i;
+      const visible = globalIdx < typedCount;
       return (
         <span
           key={i}
-          className="inline-block transition-colors duration-700"
+          className="inline-block"
           style={{
-            color: visible ? getLetterColor(i) : 'transparent',
+            color: visible ? getLetterColor(globalIdx) : 'transparent',
             opacity: visible ? 1 : 0,
             transform: visible ? 'translateY(0)' : 'translateY(20px)',
             transition: 'opacity 0.2s ease, transform 0.3s ease, color 0.7s ease',
@@ -93,15 +135,15 @@ export default function Hero() {
           </div>
         </div>
         <div className="relative w-full h-[55vw] min-h-[260px] max-h-[420px] overflow-hidden">
-          <img src="/images/placeholder-hero.jpg" alt="Favor Odedele" className="w-full h-full object-cover object-top grayscale hover:grayscale-0 transition-all duration-700" />
+          <img src={settings.portrait} alt={settings.fullName} className="w-full h-full object-cover object-top grayscale hover:grayscale-0 transition-all duration-700" />
           <div className="absolute inset-0 bg-linear-to-t from-[#948a66]/80 via-transparent to-transparent" />
           <h1 className="absolute bottom-2 left-4 font-black uppercase leading-[0.88]" style={{ fontSize: 'clamp(2.5rem, 12vw, 5rem)', letterSpacing: '-0.02em' }}>
-            <span className="block" style={{ color: LETTER_COLORS[0] }}>FAVOR</span>
-            <span className="block" style={{ color: LETTER_COLORS[1] }}>ODEDELE</span>
+            <span className="block" style={{ color: LETTER_COLORS[0] }}>{settings.fullName.split(' ')[0]}</span>
+            <span className="block" style={{ color: LETTER_COLORS[1] }}>{settings.fullName.split(' ')[1] || ''}</span>
           </h1>
         </div>
         <div className="bg-[#948a66] px-6 py-8 flex flex-col gap-4">
-          <p className="text-white text-sm font-medium leading-relaxed max-w-sm">Programs Manager specializing in Education, Entrepreneurship, and Human Capacity Development.</p>
+          <p className="text-white text-sm font-medium leading-relaxed max-w-sm">{settings.bioText}</p>
           <div className="flex gap-3 flex-wrap">
             <a href="/cv.pdf" download className="inline-block bg-white text-background-dark px-5 py-2 text-xs font-bold uppercase tracking-widest hover:bg-accent-magenta hover:text-white transition-all duration-300">Download CV</a>
             <button onClick={() => scrollToSection('case-studies')} className="inline-block border border-white/60 text-white px-5 py-2 text-xs font-bold uppercase tracking-widest hover:bg-white/10 transition-all duration-300">View Work</button>
@@ -114,7 +156,7 @@ export default function Hero() {
       <div className="hidden lg:flex items-center justify-center py-8 px-8">
         {/* Hero Card — slides up on load */}
         <div
-          className="relative w-full max-w-6xl aspect-[16/10] bg-[#948a66] shadow-2xl overflow-hidden flex flex-row rounded-[20px]"
+          className="relative w-full max-w-6xl aspect-16/10 bg-[#948a66] shadow-2xl overflow-hidden flex flex-row rounded-[20px]"
           style={{
             opacity: cardVisible ? 1 : 0,
             transform: cardVisible ? 'translateY(0)' : 'translateY(40px)',
@@ -142,44 +184,10 @@ export default function Hero() {
               >
                 {/* Render as two lines by splitting at the space */}
                 <span className="flex">
-                  {FULL_NAME.split(' ')[0].split('').map((char, i) => {
-                    const globalIdx = i;
-                    const visible = globalIdx < typedCount;
-                    return (
-                      <span
-                        key={i}
-                        className="inline-block"
-                        style={{
-                          color: visible ? getLetterColor(globalIdx) : 'transparent',
-                          opacity: visible ? 1 : 0,
-                          transform: visible ? 'translateY(0)' : 'translateY(20px)',
-                          transition: 'opacity 0.2s ease, transform 0.3s ease, color 0.7s ease',
-                        }}
-                      >
-                        {char}
-                      </span>
-                    );
-                  })}
+                  {renderNameLine(fullName.split(' ')[0] || '', 0)}
                 </span>
                 <span className="flex">
-                  {FULL_NAME.split(' ')[1].split('').map((char, i) => {
-                    const globalIdx = FULL_NAME.split(' ')[0].length + 1 + i;
-                    const visible = globalIdx < typedCount;
-                    return (
-                      <span
-                        key={i}
-                        className="inline-block"
-                        style={{
-                          color: visible ? getLetterColor(globalIdx) : 'transparent',
-                          opacity: visible ? 1 : 0,
-                          transform: visible ? 'translateY(0)' : 'translateY(20px)',
-                          transition: 'opacity 0.2s ease, transform 0.3s ease, color 0.7s ease',
-                        }}
-                      >
-                        {char}
-                      </span>
-                    );
-                  })}
+                  {renderNameLine(fullName.split(' ')[1] || '', (fullName.split(' ')[0]?.length || 0) + 1)}
                 </span>
               </h1>
             </div>
@@ -195,9 +203,9 @@ export default function Hero() {
                   transition: 'opacity 0.6s ease, transform 0.6s ease',
                 }}
               >
-                <p className="text-white text-sm font-medium leading-relaxed mb-6 min-h-[4rem]">
-                  {BIO_TEXT.slice(0, bioCount)}
-                  {bioCount < BIO_TEXT.length && (
+                <p className="text-white text-sm font-medium leading-relaxed mb-6 min-h-16">
+                  {bioText.slice(0, bioCount)}
+                  {bioCount < bioText.length && (
                     <span className="inline-block w-0.5 h-4 bg-white ml-0.5 animate-blink align-middle" />
                   )}
                 </p>
@@ -213,8 +221,8 @@ export default function Hero() {
               {/* Portrait */}
               <div className="absolute bottom-0 right-0 w-[70%] h-[90%] z-10 overflow-hidden">
                 <img
-                  src="/images/placeholder-hero.jpg"
-                  alt="Favor Odedele — Programs Manager"
+                  src={settings.portrait}
+                  alt={`${settings.fullName} — Programs Manager`}
                   className="w-full h-full object-cover object-top grayscale hover:grayscale-0 transition-all duration-700"
                 />
               </div>

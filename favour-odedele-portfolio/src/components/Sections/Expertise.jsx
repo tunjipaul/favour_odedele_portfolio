@@ -14,7 +14,7 @@ const fallbackPillars = [
     description: 'Optimizing internal workflows and managing resources to ensure peak performance across global teams.',
     hoverColor: 'group-hover:bg-primary group-hover:text-white',
     iconBg: 'text-primary',
-    borderHover: '',
+    borderHover: 'hover:border-primary',
   },
   {
     icon: 'Handshake',
@@ -38,7 +38,7 @@ const fallbackPillars = [
     description: 'Developing data-driven models to replicate success across multiple geographic and socio-economic contexts.',
     hoverColor: 'group-hover:bg-primary group-hover:text-white',
     iconBg: 'text-primary',
-    borderHover: '',
+    borderHover: 'hover:border-primary',
   },
 ];
 
@@ -117,7 +117,7 @@ export default function Expertise() {
         {/* Header */}
         <div 
           ref={headerRef}
-          className="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-12 md:mb-16 gap-4 sm:gap-6 reveal-element"
+          className="flex flex-col md:flex-row md:items-end justify بین mb-8 sm:mb-12 md:mb-16 gap-4 sm:gap-6 reveal-element"
         >
           <div className="max-w-2xl">
             <h2 className="text-accent-magenta font-bold tracking-widest uppercase text-xs sm:text-sm mb-3 sm:mb-4">
@@ -140,7 +140,7 @@ export default function Expertise() {
               <div
                 key={pillar.title}
                 ref={(el) => (cardsRef.current[index] = el)}
-                className={`reveal-element group p-8 rounded-xl border border-slate-200 hover:border-primary transition-all cursor-pointer bg-background-muted ${pillar.borderHover || ''}`}
+                className={`reveal-element group p-8 rounded-xl border border-slate-200 transition-all cursor-pointer bg-background-muted ${pillar.borderHover || 'hover:border-primary'}`}
               >
                 <div
                   ref={(el) => (iconsRef.current[index] = el)}

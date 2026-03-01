@@ -148,6 +148,9 @@ const siteSettings = {
     quote: 'Program management is not about you... It is more about your beneficiaries.',
     linkedIn: '',
     email: '',
+    bookCall: '',
+    substack: '',
+    twitter: '',
   },
 };
 

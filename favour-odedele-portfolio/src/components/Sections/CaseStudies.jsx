@@ -25,8 +25,8 @@ export default function CaseStudies() {
           Case Studies: Problems Solved
         </h2>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 md:gap-10">
-          {projects.map((project) => (
-            <ProjectCard key={project.id} project={project} />
+          {projects.map((project, index) => (
+            <ProjectCard key={project._id || project.id || `${project.title}-${index}`} project={project} />
           ))}
         </div>
       </div>

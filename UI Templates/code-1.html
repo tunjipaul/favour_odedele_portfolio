@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Favor Admin - Portfolio Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#4b5320",
+                        "army-green": "#4b5320",
+                        "navy-sidebar": "#0f172a",
+                        "background-light": "#fcfcfc",
+                        "background-dark": "#0f172a",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body { font-family: 'Manrope', sans-serif; }
+        .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+        .sidebar-item-active { background-color: rgba(75, 83, 32, 0.15); border-left: 4px solid #4b5320; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display">
+<div class="flex min-h-screen">
+<!-- Sidebar Navigation -->
+<aside class="w-72 bg-navy-sidebar text-slate-300 flex flex-col border-r border-slate-800 shrink-0">
+<div class="p-6 flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white font-bold text-xl">F</div>
+<div>
+<h1 class="text-white text-lg font-bold leading-none">Favor Admin</h1>
+<p class="text-slate-500 text-xs mt-1">Portfolio Management</p>
+</div>
+</div>
+<nav class="flex-1 px-4 py-4 space-y-1">
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg sidebar-item-active text-white" href="#">
+<span class="material-symbols-outlined text-primary">dashboard</span>
+<span class="text-sm font-semibold">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">event_upcoming</span>
+<span class="text-sm font-medium">Book Waitlist</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">work</span>
+<span class="text-sm font-medium">Case Studies</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">gallery_thumbnail</span>
+<span class="text-sm font-medium">Media Gallery</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">reviews</span>
+<span class="text-sm font-medium">Testimonials</span>
+</a>
+<div class="pt-8 pb-2 px-4 uppercase text-[10px] font-bold tracking-widest text-slate-500">System</div>
+<a class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-slate-800 transition-colors" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-sm font-medium">Settings</span>
+</a>
+</nav>
+<div class="p-6">
+<button class="w-full flex items-center justify-center gap-2 py-3 bg-primary hover:bg-primary/90 text-white rounded-xl font-bold text-sm shadow-lg shadow-primary/20 transition-all">
+<span class="material-symbols-outlined text-sm">open_in_new</span>
+                    View Live Site
+                </button>
+</div>
+</aside>
+<!-- Main Content -->
+<main class="flex-1 flex flex-col overflow-y-auto bg-slate-50 dark:bg-slate-900">
+<!-- Header -->
+<header class="h-20 flex items-center justify-between px-8 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
+<div>
+<h2 class="text-2xl font-extrabold tracking-tight">Executive Overview</h2>
+<p class="text-slate-500 dark:text-slate-400 text-sm">Welcome back, Favor. Managing your leadership portfolio.</p>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-slate-400 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<div class="h-10 w-10 rounded-full bg-slate-200 dark:bg-slate-800 flex items-center justify-center overflow-hidden border-2 border-army-green/20">
+<img class="w-full h-full object-cover" data-alt="Professional headshot of a business leader" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDRQKfkdDgKhSu0skVy033tybWSkD1ZyrZ0kVwmIMZhKLJiKVg-vcjfv0x3WLLytFOdB-M6Wfk0jpZDqaAhY1yQtGMa_YcXiMlchP5X-w50RID2TXl4GjWTibZf3sjem-P7P7bFoQ_Hw6kG7141AVWTDLqQWe7dTbS9I6eaA775Y4pdNchb1JShaALMByTtx1cPJT3bDWj7Vb3aJUKDqE1GCsMNu77aUlNuXL_baJ5kCCGLTiUzIm9IBiRdVWKp0X_vApoY5f0C99Q"/>
+</div>
+</div>
+</header>
+<!-- Dashboard Content -->
+<div class="p-8 space-y-8">
+<!-- Quick Actions Grid -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="bg-army-green/5 dark:bg-army-green/10 border border-army-green/20 p-6 rounded-2xl flex items-center justify-between group cursor-pointer hover:border-army-green transition-all">
+<div>
+<h3 class="font-bold text-army-green text-lg">New Case Study</h3>
+<p class="text-slate-500 text-xs mt-1">Publish a new leadership project</p>
+</div>
+<div class="w-12 h-12 rounded-xl bg-primary flex items-center justify-center text-white shadow-md">
+<span class="material-symbols-outlined">add_circle</span>
+</div>
+</div>
+<div class="bg-army-green/5 dark:bg-army-green/10 border border-army-green/20 p-6 rounded-2xl flex items-center justify-between group cursor-pointer hover:border-army-green transition-all">
+<div>
+<h3 class="font-bold text-army-green text-lg">Upload Media</h3>
+<p class="text-slate-500 text-xs mt-1">Add photos or videos to gallery</p>
+</div>
+<div class="w-12 h-12 rounded-xl bg-army-green flex items-center justify-center text-white shadow-md">
+<span class="material-symbols-outlined">cloud_upload</span>
+</div>
+</div>
+<div class="bg-slate-100 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700 p-6 rounded-2xl flex items-center justify-between group cursor-pointer hover:border-slate-400 transition-all">
+<div>
+<h3 class="font-bold text-slate-700 dark:text-slate-200 text-lg">Manage Waitlist</h3>
+<p class="text-slate-500 text-xs mt-1">View and export all signups</p>
+</div>
+<div class="w-12 h-12 rounded-xl bg-slate-700 dark:bg-slate-600 flex items-center justify-center text-white shadow-md">
+<span class="material-symbols-outlined">list_alt</span>
+</div>
+</div>
+</section>
+<!-- Analytics Row -->
+<div class="grid grid-cols-1 xl:grid-cols-3 gap-8">
+<!-- Waitlist Chart -->
+<div class="xl:col-span-2 bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl shadow-sm">
+<div class="flex items-center justify-between mb-8">
+<div>
+<h3 class="text-lg font-bold">Waitlist Growth</h3>
+<p class="text-sm text-slate-500">Daily signups over the last 30 days</p>
+</div>
+<div class="flex items-center gap-2">
+<span class="px-3 py-1 bg-army-green/10 text-army-green text-xs font-bold rounded-full">+18.5% this month</span>
+<span class="material-symbols-outlined text-slate-400">more_horiz</span>
+</div>
+</div>
+<div class="relative h-64 w-full">
+<!-- Simplified Chart Representation -->
+<svg class="w-full h-full" preserveaspectratio="none" viewbox="0 0 1000 300">
+<defs><lineargradient id="chartGradient" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#4b5320" stop-opacity="0.3"></stop>
+<stop offset="100%" stop-color="#4b5320" stop-opacity="0"></stop>
+</lineargradient></defs>
+<path d="M0,250 Q100,220 200,240 T400,150 T600,180 T800,80 T1000,100 V300 H0 Z" fill="url(#chartGradient)"></path>
+<path d="M0,250 Q100,220 200,240 T400,150 T600,180 T800,80 T1000,100" fill="none" stroke="#4b5320" stroke-linecap="round" stroke-width="4"></path>
+</svg>
+<div class="flex justify-between mt-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+<span>Week 1</span>
+<span>Week 2</span>
+<span>Week 3</span>
+<span>Week 4</span>
+</div>
+</div>
+</div>
+<!-- Statistics Column -->
+<div class="space-y-6">
+<div class="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-army-green/10 flex items-center justify-center text-army-green">
+<span class="material-symbols-outlined">group</span>
+</div>
+<div>
+<p class="text-sm text-slate-500 font-medium">Total Signups</p>
+<p class="text-2xl font-black">1,240</p>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-army-green/10 flex items-center justify-center text-army-green">
+<span class="material-symbols-outlined">task_alt</span>
+</div>
+<div>
+<p class="text-sm text-slate-500 font-medium">Active Projects</p>
+<p class="text-2xl font-black">12</p>
+</div>
+</div>
+</div>
+<div class="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 p-6 rounded-2xl">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400">
+<span class="material-symbols-outlined">image</span>
+</div>
+<div>
+<p class="text-sm text-slate-500 font-medium">Gallery Items</p>
+<p class="text-2xl font-black">156</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Recent Activities Table/List -->
+<section class="bg-white dark:bg-slate-900/40 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
+<div class="px-6 py-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+<h3 class="text-lg font-bold">Recent Case Study Edits</h3>
+<button class="text-army-green text-sm font-bold hover:underline">View All Projects</button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left">
+<thead class="bg-slate-50 dark:bg-slate-800/50 text-slate-500 text-xs font-bold uppercase tracking-wider">
+<tr>
+<th class="px-6 py-4">Project Title</th>
+<th class="px-6 py-4">Status</th>
+<th class="px-6 py-4">Last Modified</th>
+<th class="px-6 py-4">Author</th>
+<th class="px-6 py-4 text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-slate-200 dark:bg-slate-700 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Corporate strategy board meeting photo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGx257iv3nlCpPVFGHjU9O4BLkE3Iqt3F4mQ4IyOzFwsakzVt_qLMfpAehNxc8Nb44X-0vcYSdWyk6o6Upi8DKMUw6FaS64U0LXyDpu2yhCc_rqzUFR31-az0uNVtHeNu2BX_7_Qk_8iFZdrXNJCZWkum55dnKhel7ygaqs62Fes_IbAfmDukOLrqXGxTf3GFpzbnOBWgtKfj_m3qMzE67ugKq18F9XcifZgMwixzGzlMag_Jy5qqTp6V_Sd-GK2Vo2xc3pt3U_-4"/>
+</div>
+<span class="font-bold text-sm">Fintech Leadership Strategy 2024</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 bg-army-green/10 text-army-green text-[10px] font-bold rounded uppercase">Published</span>
+</td>
+<td class="px-6 py-4 text-sm text-slate-500">2 hours ago</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-army-green text-[10px] flex items-center justify-center text-white">FA</div>
+<span class="text-sm">Favor A.</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="p-2 text-slate-400 hover:text-primary"><span class="material-symbols-outlined text-xl">edit_note</span></button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-slate-200 dark:bg-slate-700 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Analytics dashboard on a screen" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDFlf83evTanVp8pbAI1be7ZRGhFjCFZj_8elGy8k46L2AqYVDt17nkmnLgdErDjcU3sJxCP55VUerae1FolL9fMlMnk67Sg3MtGIF1PfeJnaAVjWsO_Uec4jI08EFSCd6sEf99q5hWIDo2PyQP5zgt6G71eVExxv04i03Qc6-Apcit8Ye64u924XBG6kvka8LNurkK-0yPS1VztdB_TTzEd3DtXKJ7nygnf4xY3YVm9A1vi097Q_OkG_wH7-_T0Ets2d56FA2rb6Q"/>
+</div>
+<span class="font-bold text-sm">Product Innovation Workshop</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="w-12 h-12 rounded-full bg-army-green/10 flex items-center justify-center text-army-green">In Review</span>
+</td>
+<td class="px-6 py-4 text-sm text-slate-500">Yesterday, 4:45 PM</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-slate-400 text-[10px] flex items-center justify-center text-white">JD</div>
+<span class="text-sm">John D.</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="p-2 text-slate-400 hover:text-primary"><span class="material-symbols-outlined text-xl">edit_note</span></button>
+</td>
+</tr>
+<tr class="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded bg-slate-200 dark:bg-slate-700 overflow-hidden">
+<img class="w-full h-full object-cover" data-alt="Team of professionals collaborating" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBqEw-jOvKkzsl0yd2tgM2nMnvfheYFLPsPIz7fBW9dzZh9eZld5iLpWutH_CM67H14QZJcq7pz3jeKa5l_iLyklltX0Ve80XXBxyWx01ESHH31Cz4VUScS7UW919BOKdje5G3oPe5vlhp6jujIjr-21Kl1b0-OhX0g7yaoCF_bEB2gcnN8xYdXNmGRbLP-snMmBF_tGq-O26weXwsU3X-pMaypj27WO1MTUAaF7RKpQldtF_YqK_pucRq-5iPVyU4xEIkkz8nxZpg"/>
+</div>
+<span class="font-bold text-sm">Enterprise Scalability Report</span>
+</div>
+</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 bg-slate-100 dark:bg-slate-800 text-slate-500 text-[10px] font-bold rounded uppercase">Draft</span>
+</td>
+<td class="px-6 py-4 text-sm text-slate-500">3 days ago</td>
+<td class="px-6 py-4">
+<div class="flex items-center gap-2">
+<div class="w-6 h-6 rounded-full bg-army-green text-[10px] flex items-center justify-center text-white">FA</div>
+<span class="text-sm">Favor A.</span>
+</div>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="p-2 text-slate-400 hover:text-primary"><span class="material-symbols-outlined text-xl">edit_note</span></button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</section>
+</div>
+<!-- Footer -->
+<footer class="mt-auto py-6 px-8 text-center text-slate-500 text-xs border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900">
+                © 2024 Favor Portfolio Management System. All rights reserved. Professional Leadership Suite v2.4.0
+            </footer>
+</main>
+</div>
+</body></html>

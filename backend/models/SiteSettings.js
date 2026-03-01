@@ -30,6 +30,9 @@ const siteSettingsSchema = new mongoose.Schema(
       },
       linkedIn: { type: String, default: '' },
       email: { type: String, default: '' },
+      bookCall: { type: String, default: '' },
+      substack: { type: String, default: '' },
+      twitter: { type: String, default: '' },
     },
   },
   { timestamps: true }

@@ -1,14 +1,16 @@
-import { useState, useEffect } from 'react';
-import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
+import { useEffect, useState } from 'react';
+import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { authApi } from './utils/api';
 import {
   LayoutDashboard,
-  FolderOpen,
-  Image,
+  Layers3,
+  GraduationCap,
   BarChart3,
-  Star,
-  Settings,
+  FolderOpen,
+  CalendarDays,
+  Image,
   Mail,
+  ArrowUpRight,
   LogOut,
   Menu,
   X,
@@ -16,12 +18,13 @@ import {
 
 const navItems = [
   { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/admin/projects', icon: FolderOpen, label: 'Projects' },
-  { to: '/admin/gallery', icon: Image, label: 'Gallery' },
-  { to: '/admin/metrics', icon: BarChart3, label: 'Metrics' },
-  { to: '/admin/expertise', icon: Star, label: 'Expertise' },
-  { to: '/admin/settings', icon: Settings, label: 'Settings' },
-  { to: '/admin/waitlist', icon: Mail, label: 'Waitlist' },
+  { to: '/admin/front-page', icon: Layers3, label: 'Front Page' },
+  { to: '/admin/expertise', icon: GraduationCap, label: 'Expertise' },
+  { to: '/admin/metrics', icon: BarChart3, label: 'Impact' },
+  { to: '/admin/projects', icon: FolderOpen, label: 'Case Studies' },
+  { to: '/admin/waitlist', icon: CalendarDays, label: 'Book Waitlist' },
+  { to: '/admin/gallery', icon: Image, label: 'Gallery of Impact' },
+  { to: '/admin/settings', icon: Mail, label: 'Contact' },
 ];
 
 function Sidebar({ onClose }) {
@@ -33,49 +36,66 @@ function Sidebar({ onClose }) {
   };
 
   return (
-    <aside className="w-64 bg-[#064E3B] text-white flex flex-col h-full">
-      {/* Logo + close button (mobile only) */}
-      <div className="px-6 py-6 border-b border-white/10 flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-extrabold tracking-tight">Favor Odedele</h1>
-          <p className="text-xs text-white/50 mt-1">Admin Panel</p>
+    <aside className="w-64 sm:w-72 bg-slate-950 border-r border-white/10 text-slate-200 flex flex-col">
+      <div className="px-4 sm:px-6 py-5 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="w-10 sm:w-11 h-10 sm:h-11 rounded-full bg-emerald-600 flex flex-shrink-0 items-center justify-center font-bold text-white text-sm sm:text-base">F</div>
+          <div className="min-w-0">
+            <p className="text-xs sm:text-sm font-semibold text-white truncate">Favor Admin</p>
+            <p className="text-[10px] sm:text-xs text-slate-400 truncate">Portfolio Management</p>
+          </div>
         </div>
         {onClose && (
-          <button onClick={onClose} className="text-white/60 hover:text-white lg:hidden">
-            <X className="w-5 h-5" />
+          <button
+            onClick={onClose}
+            className="p-1 rounded-lg bg-white/10 hover:bg-white/20 text-slate-200"
+            aria-label="Close sidebar"
+          >
+            <X className="w-4 h-4" />
           </button>
         )}
       </div>
 
-      {/* Nav Links */}
-      <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-        {navItems.map(({ to, icon: Icon, label }) => (
+      <nav className="flex-1 px-3 sm:px-4 py-4 space-y-1 overflow-y-auto">
+        {navItems.map((item) => (
           <NavLink
-            key={to}
-            to={to}
-            onClick={onClose}
+            key={item.to}
+            to={item.to}
+            onClick={() => onClose?.()}
             className={({ isActive }) =>
-              `flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all ${
+              `flex items-center gap-3 px-3 sm:px-4 py-2 sm:py-3 text-xs sm:text-sm rounded-lg transition-colors whitespace-nowrap ${
                 isActive
-                  ? 'bg-white text-[#064E3B]'
-                  : 'text-white/70 hover:bg-white/10 hover:text-white'
+                  ? 'bg-emerald-600/30 text-white font-semibold border-l-4 border-emerald-400'
+                  : 'text-slate-300 hover:bg-slate-900/60'
               }`
             }
           >
-            <Icon className="w-4 h-4 shrink-0" />
-            {label}
+            <item.icon className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+            <span className="hidden sm:inline">{item.label}</span>
           </NavLink>
         ))}
+
       </nav>
 
-      {/* Logout */}
-      <div className="px-3 py-4 border-t border-white/10">
-        <button
-          onClick={handleLogout}
-          className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-white/70 hover:bg-white/10 hover:text-white transition-all"
+      <div className="px-4 sm:px-6 py-4 sm:py-6 space-y-2 sm:space-y-3 border-t border-white/5">
+        <a
+          href="/"
+          className="w-full flex items-center justify-center gap-2 py-2 sm:py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs sm:text-sm font-bold transition-all shadow-lg shadow-emerald-500/30"
+          target="_blank"
+          rel="noreferrer"
         >
-          <LogOut className="w-4 h-4" />
-          Logout
+          <ArrowUpRight className="w-3 h-3 sm:w-4 sm:h-4" />
+          <span className="hidden sm:inline">View Live Site</span>
+          <span className="sm:hidden">Live Site</span>
+        </a>
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="w-full flex items-center justify-center gap-2 py-2 sm:py-3 bg-white/10 hover:bg-white/20 text-slate-200 rounded-xl text-xs sm:text-sm font-semibold transition-all"
+        >
+          <LogOut className="w-3 h-3 sm:w-4 sm:h-4" />
+          <span className="hidden sm:inline">Logout</span>
+          <span className="sm:hidden">Sign Out</span>
         </button>
       </div>
     </aside>
@@ -84,69 +104,54 @@ function Sidebar({ onClose }) {
 
 export default function AdminLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const location = useLocation();
 
-  // Close sidebar on route change (mobile)
   useEffect(() => {
-    setSidebarOpen(false);
-  }, [location.pathname]);
-
-  // Prevent body scroll when sidebar drawer is open
-  useEffect(() => {
-    if (sidebarOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
+    document.body.style.overflow = sidebarOpen ? 'hidden' : '';
+    return () => {
       document.body.style.overflow = '';
-    }
-    return () => { document.body.style.overflow = ''; };
+    };
   }, [sidebarOpen]);
 
   return (
-    <div className="flex h-screen bg-gray-100 font-sans overflow-hidden">
-
-      {/* ── Desktop sidebar (always visible on lg+) ── */}
+    <div className="flex min-h-screen bg-slate-950 text-white">
       <div className="hidden lg:flex lg:shrink-0">
         <Sidebar onClose={null} />
       </div>
 
-      {/* ── Mobile sidebar drawer ── */}
-      {/* Backdrop */}
       <div
-        className={`fixed inset-0 bg-black/50 z-40 lg:hidden transition-opacity duration-300 ${
+        className={`lg:hidden fixed inset-0 z-40 bg-black/60 transition-opacity duration-300 ${
           sidebarOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
         onClick={() => setSidebarOpen(false)}
       />
-      {/* Drawer */}
+
       <div
-        className={`fixed inset-y-0 left-0 z-50 lg:hidden flex transition-transform duration-300 ${
+        className={`lg:hidden fixed inset-y-0 left-0 z-50 flex transition-transform duration-300 ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
         <Sidebar onClose={() => setSidebarOpen(false)} />
       </div>
 
-      {/* ── Main area ── */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
-        {/* Mobile top bar */}
-        <header className="lg:hidden flex items-center gap-4 px-4 py-3 bg-white border-b border-gray-200 shadow-sm">
-          <button
-            onClick={() => setSidebarOpen(true)}
-            className="p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
-            aria-label="Open sidebar"
-          >
-            <Menu className="w-5 h-5" />
-          </button>
-          <div className="flex items-center gap-3">
-            <span className="font-extrabold text-[#064E3B] text-sm tracking-tight">Favor Odedele</span>
-            <span className="text-gray-400 text-xs border-l border-gray-200 pl-3">Admin</span>
+      <div className="flex flex-1 flex-col">
+        <div className="lg:hidden border-b border-white/10 bg-slate-950 px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-9 h-9 rounded-full bg-emerald-600 flex flex-shrink-0 items-center justify-center font-bold text-white text-xs">F</div>
+            <div className="min-w-0">
+              <p className="text-xs sm:text-sm font-semibold truncate">Favor Admin</p>
+              <p className="text-[10px] text-slate-400 truncate">Portfolio Management</p>
+            </div>
           </div>
-        </header>
+          <button onClick={() => setSidebarOpen(true)} className="p-2 rounded-lg bg-white/10 hover:bg-white/20 flex-shrink-0">
+            <Menu className="w-5 h-5 text-white" />
+          </button>
+        </div>
 
-        {/* Page content */}
-        <main className="flex-1 overflow-y-auto">
-          <Outlet />
-        </main>
+        <div className="flex-1 overflow-hidden">
+          <div className="overflow-y-auto min-h-full">
+            <Outlet />
+          </div>
+        </div>
       </div>
     </div>
   );
