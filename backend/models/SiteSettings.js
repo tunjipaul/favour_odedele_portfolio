@@ -11,6 +11,7 @@ const siteSettingsSchema = new mongoose.Schema(
         default: 'Programs Manager specializing in Education, Entrepreneurship, and Human Capacity Development.',
       },
       portrait: { type: String, default: '' }, // Hero image Cloudinary URL
+      cvUrl: { type: String, default: '' }, // CV PDF Cloudinary URL
     },
     book: {
       title: { type: String, default: 'Success Leaves Cues' },

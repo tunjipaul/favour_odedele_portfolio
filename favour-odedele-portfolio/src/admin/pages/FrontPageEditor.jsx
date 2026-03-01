@@ -7,6 +7,7 @@ const EMPTY_SETTINGS = {
     fullName: '',
     bioText: '',
     portrait: '',
+    cvUrl: '',
   },
 };
 
@@ -108,6 +109,31 @@ export default function FrontPageEditor() {
       flash(err.message || 'Portrait upload failed', true);
     } finally {
       setUploadingPortrait(false);
+      event.target.value = '';
+    }
+  };
+
+  const handleCVUpload = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    if (file.type !== 'application/pdf') {
+      flash('Please upload a PDF file for your CV.', true);
+      event.target.value = '';
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const formData = new FormData();
+      formData.append('image', file); // API expects field name 'image'
+      const data = await api.upload('/admin/upload', formData);
+      updateHero('cvUrl', data.url || '');
+      flash('CV uploaded successfully.');
+    } catch (err) {
+      flash(err.message || 'CV upload failed', true);
+    } finally {
+      setSaving(false);
       event.target.value = '';
     }
   };
@@ -242,6 +268,32 @@ export default function FrontPageEditor() {
                     <p className="text-xs leading-relaxed text-blue-100">
                       This editor maps to existing hero settings used by the site: name, bio text, and portrait image.
                     </p>
+                  </div>
+
+                  <div className="pt-4 border-t border-white/10">
+                    <p className="text-sm font-semibold text-slate-200 mb-3">Professional CV (PDF)</p>
+                    <div className="flex items-center gap-4">
+                      <label className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white/10 border border-white/20 text-sm font-semibold text-slate-200 hover:bg-white/20 cursor-pointer transition-colors">
+                        <Upload className="w-4 h-4" />
+                        Upload New CV
+                        <input
+                          type="file"
+                          accept=".pdf"
+                          onChange={handleCVUpload}
+                          className="hidden"
+                        />
+                      </label>
+                      {settings.hero.cvUrl && (
+                        <a 
+                          href={settings.hero.cvUrl} 
+                          target="_blank" 
+                          rel="noreferrer"
+                          className="text-xs text-orange-400 hover:text-orange-300 font-medium underline underline-offset-4"
+                        >
+                          View Current CV
+                        </a>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>

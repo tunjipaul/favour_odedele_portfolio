@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { authApi } from './admin/utils/api';
 
@@ -29,6 +30,24 @@ function ProtectedRoute({ children }) {
 }
 
 export default function App() {
+  // Keep-alive pinger for Render free tier (prevents sleep)
+  useEffect(() => {
+    const ping = async () => {
+      try {
+        await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'}/health`);
+      } catch (e) {
+        // Silently fail, just a keep-alive
+      }
+    };
+    
+    // Ping immediately on load
+    ping();
+    
+    // Then every 14 minutes (Render sleeps at 15 mins)
+    const interval = setInterval(ping, 14 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <Routes>
       {/* ── Public Portfolio ─────────────────────── */}

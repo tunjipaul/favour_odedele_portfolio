@@ -18,7 +18,7 @@ const storage = new CloudinaryStorage({
   cloudinary: cloudinaryV2,
   params: {
     folder: 'favour-portfolio', // All uploads go into this Cloudinary folder
-    allowed_formats: ['jpg', 'jpeg', 'png', 'webp'],
+    allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'pdf'],
     transformation: [{ width: 1200, quality: 'auto', fetch_format: 'auto' }],
   },
 });

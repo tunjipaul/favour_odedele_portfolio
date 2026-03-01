@@ -12,7 +12,8 @@ export default function Hero() {
   const [settings, setSettings] = useState({ 
     fullName: FALLBACK_NAME, 
     bioText: FALLBACK_BIO, 
-    portrait: FALLBACK_PORTRAIT 
+    portrait: FALLBACK_PORTRAIT,
+    cvUrl: '/cv.pdf'
   });
   const [cardVisible, setCardVisible] = useState(false);
   const [typedCount, setTypedCount] = useState(0);
@@ -52,7 +53,8 @@ export default function Hero() {
           setSettings({
             fullName: data.hero.fullName || FALLBACK_NAME,
             bioText: data.hero.bioText || FALLBACK_BIO,
-            portrait: data.hero.portrait || FALLBACK_PORTRAIT
+            portrait: data.hero.portrait || FALLBACK_PORTRAIT,
+            cvUrl: data.hero.cvUrl || '/cv.pdf'
           });
         }
       } catch (err) {
@@ -145,7 +147,7 @@ export default function Hero() {
         <div className="bg-[#948a66] px-6 py-8 flex flex-col gap-4">
           <p className="text-white text-sm font-medium leading-relaxed max-w-sm">{settings.bioText}</p>
           <div className="flex gap-3 flex-wrap">
-            <a href="/cv.pdf" download className="inline-block bg-white text-background-dark px-5 py-2 text-xs font-bold uppercase tracking-widest hover:bg-accent-magenta hover:text-white transition-all duration-300">Download CV</a>
+            <a href={settings.cvUrl} download className="inline-block bg-white text-background-dark px-5 py-2 text-xs font-bold uppercase tracking-widest hover:bg-accent-magenta hover:text-white transition-all duration-300">Download CV</a>
             <button onClick={() => scrollToSection('case-studies')} className="inline-block border border-white/60 text-white px-5 py-2 text-xs font-bold uppercase tracking-widest hover:bg-white/10 transition-all duration-300">View Work</button>
           </div>
         </div>
@@ -210,7 +212,7 @@ export default function Hero() {
                   )}
                 </p>
                 <a
-                  href="/cv.pdf"
+                  href={settings.cvUrl}
                   download
                   className="inline-block bg-white text-background-dark px-6 py-2 text-xs font-bold uppercase tracking-widest hover:bg-accent-magenta hover:text-white transition-all duration-300"
                 >

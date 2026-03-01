@@ -54,7 +54,12 @@ app.use('/api/auth', authRoutes);
 app.use('/api/admin', adminRoutes);
 
 // ─── Health Check ────────────────────────────────────────────────────────────
-// Useful for checking if the server is running at all
+// Useful for checking if the server is running at all and to prevent sleep on Render
+app.get('/api/health', (_req, res) => {
+  res.json({ status: 'ok', uptime: process.uptime() });
+});
+
+// Useful for checking if the server is running at all (legacy root)
 app.get('/', (req, res) => {
   res.json({ message: '✅ Favour Portfolio API is running' });
 });
