@@ -36,7 +36,7 @@ function Sidebar({ onClose }) {
   };
 
   return (
-    <aside className="w-64 sm:w-72 bg-slate-950 border-r border-white/10 text-slate-200 flex flex-col">
+    <aside className="w-64 sm:w-72 bg-slate-950 border-r border-white/10 text-slate-200 flex flex-col lg:sticky lg:top-0 lg:h-screen">
       <div className="px-4 sm:px-6 py-5 flex items-center justify-between gap-3">
         <div className="flex items-center gap-3 min-w-0">
           <div className="w-10 sm:w-11 h-10 sm:h-11 rounded-full bg-emerald-600 flex flex-shrink-0 items-center justify-center font-bold text-white text-sm sm:text-base">F</div>
@@ -113,7 +113,7 @@ export default function AdminLayout() {
   }, [sidebarOpen]);
 
   return (
-    <div className="flex min-h-screen bg-slate-950 text-white">
+    <div className="flex h-screen overflow-hidden bg-slate-950 text-white">
       <div className="hidden lg:flex lg:shrink-0">
         <Sidebar onClose={null} />
       </div>
