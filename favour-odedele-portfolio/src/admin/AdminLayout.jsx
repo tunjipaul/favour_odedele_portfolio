@@ -113,7 +113,7 @@ export default function AdminLayout() {
   }, [sidebarOpen]);
 
   return (
-    <div className="flex h-screen overflow-hidden bg-slate-950 text-white">
+    <div className="flex min-h-screen bg-slate-950 text-white">
       <div className="hidden lg:flex lg:shrink-0">
         <Sidebar onClose={null} />
       </div>
