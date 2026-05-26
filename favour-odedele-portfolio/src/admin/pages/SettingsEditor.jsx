@@ -73,10 +73,12 @@ export default function SettingsEditor() {
               />
             </div>
             <div>
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Book a Call URL</label>
+              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Book a Call Phone Number</label>
               <input
                 value={footer.bookCall || ''}
                 onChange={(e) => updateField('bookCall', e.target.value)}
+                type="tel"
+                placeholder="+2348012345678"
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#064E3B]"
               />
             </div>

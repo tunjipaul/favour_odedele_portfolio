@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ImagePlus, Info, Save, Undo2, Upload } from 'lucide-react';
 import { api } from '../utils/api';
+import { API_BASE_URL } from '../../config.js';
 
 const EMPTY_SETTINGS = {
   hero: {
@@ -29,6 +30,7 @@ export default function FrontPageEditor() {
   const [msg, setMsg] = useState('');
   const [isError, setIsError] = useState(false);
   const [uploadingPortrait, setUploadingPortrait] = useState(false);
+  const [pendingCvUrl, setPendingCvUrl] = useState('');
 
   const flash = (text, error = false) => {
     setMsg(text);
@@ -60,6 +62,14 @@ export default function FrontPageEditor() {
     };
   }, []);
 
+  useEffect(() => {
+    return () => {
+      if (pendingCvUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(pendingCvUrl);
+      }
+    };
+  }, [pendingCvUrl]);
+
   const updateHero = (key, value) => {
     setSettings((prev) => ({
       ...prev,
@@ -86,6 +96,7 @@ export default function FrontPageEditor() {
       const shaped = safeSettingsShape(updated);
       setSettings(shaped);
       setSavedSnapshot(shaped);
+      setPendingCvUrl('');
       flash('Front page updated successfully.');
     } catch (err) {
       flash(err.message || 'Could not save front page settings', true);
@@ -125,11 +136,29 @@ export default function FrontPageEditor() {
 
     setSaving(true);
     try {
+      const previewUrl = URL.createObjectURL(file);
+      setPendingCvUrl((prev) => {
+        if (prev.startsWith('blob:')) {
+          URL.revokeObjectURL(prev);
+        }
+        return previewUrl;
+      });
+
       const formData = new FormData();
       formData.append('image', file); // API expects field name 'image'
       const data = await api.upload('/admin/upload', formData);
-      updateHero('cvUrl', data.url || '');
-      flash('CV uploaded successfully.');
+      const nextSettings = {
+        ...settings,
+        hero: {
+          ...settings.hero,
+          cvUrl: data.url || '',
+        },
+      };
+      const updated = await api.put('/admin/settings', nextSettings);
+      const shaped = safeSettingsShape(updated);
+      setSettings(shaped);
+      setSavedSnapshot(shaped);
+      flash('CV uploaded and published successfully.');
     } catch (err) {
       flash(err.message || 'CV upload failed', true);
     } finally {
@@ -137,6 +166,35 @@ export default function FrontPageEditor() {
       event.target.value = '';
     }
   };
+
+  const handleClearCV = async () => {
+    setSaving(true);
+    try {
+      const nextSettings = {
+        ...settings,
+        hero: {
+          ...settings.hero,
+          cvUrl: '',
+        },
+      };
+      const updated = await api.put('/admin/settings', nextSettings);
+      const shaped = safeSettingsShape(updated);
+      setSettings(shaped);
+      setSavedSnapshot(shaped);
+      setPendingCvUrl('');
+      flash('CV removed successfully.');
+    } catch (err) {
+      flash(err.message || 'Could not remove CV', true);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const cvPreviewUrl = pendingCvUrl
+    || (settings.hero.cvUrl
+      ? `${API_BASE_URL}/cv?v=${encodeURIComponent(settings.hero.cvUrl)}`
+      : '');
+  const cvDownloadUrl = `${API_BASE_URL}/cv?download=1`;
 
   if (loading) {
     return <div className="p-8 text-slate-300">Loading front page editor...</div>;
@@ -285,13 +343,45 @@ export default function FrontPageEditor() {
                       </label>
                       {settings.hero.cvUrl && (
                         <a 
-                          href={settings.hero.cvUrl} 
+                          href={cvPreviewUrl || cvDownloadUrl} 
                           target="_blank" 
                           rel="noreferrer"
                           className="text-xs text-orange-400 hover:text-orange-300 font-medium underline underline-offset-4"
                         >
                           View Current CV
                         </a>
+                      )}
+                      {settings.hero.cvUrl && (
+                        <button
+                          type="button"
+                          onClick={handleClearCV}
+                          disabled={saving}
+                          className="text-xs text-red-300 hover:text-red-200 font-medium underline underline-offset-4 disabled:opacity-50"
+                        >
+                          Remove CV
+                        </button>
+                      )}
+                    </div>
+                    <div className="mt-4 overflow-hidden rounded-2xl border border-white/10 bg-slate-950/80">
+                      {cvPreviewUrl ? (
+                        <iframe
+                          key={cvPreviewUrl}
+                          src={cvPreviewUrl}
+                          title="Current CV preview"
+                          className="h-[320px] w-full bg-white"
+                        />
+                      ) : (
+                        <div className="grid h-[320px] place-items-center px-6 text-center bg-gradient-to-br from-slate-950 to-slate-900">
+                          <div className="max-w-sm rounded-2xl border border-white/10 bg-white/5 px-6 py-7 shadow-lg">
+                            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full border border-orange-400/30 bg-orange-500/10 text-orange-300">
+                              <Upload className="h-5 w-5" />
+                            </div>
+                            <p className="text-sm font-semibold text-slate-100">No CV available</p>
+                            <p className="mt-2 text-xs leading-relaxed text-slate-400">
+                              Upload a PDF CV to preview it here and publish the public download link.
+                            </p>
+                          </div>
+                        </div>
                       )}
                     </div>
                   </div>

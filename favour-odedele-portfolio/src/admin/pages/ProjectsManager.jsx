@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { api } from '../utils/api';
-import { Pencil, Trash2, Plus, X, Check, Upload } from 'lucide-react';
+import { Pencil, Trash2, Plus, X, Check, Upload, Search } from 'lucide-react';
 
 const EMPTY_FORM = {
   title: '',
@@ -33,6 +33,7 @@ export default function ProjectsManager() {
   const [confirmingId, setConfirmingId] = useState(null);
   const [activeFilter, setActiveFilter] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [showSearch, setShowSearch] = useState(false);
   const [loadingProjects, setLoadingProjects] = useState(true);
   const [uploadingImage, setUploadingImage] = useState(false);
 
@@ -159,16 +160,33 @@ export default function ProjectsManager() {
           </header>
 
           <div className="flex flex-col gap-3 sm:gap-4">
-            <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
-              <div className="flex flex-1 items-center bg-slate-900/70 rounded-2xl border border-white/10 px-3 py-2 sm:py-2.5">
-                <span className="material-symbols-outlined text-lg text-slate-400">search</span>
-                <input
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
-                  placeholder="Search case studies..."
-                  className="ml-2 flex-1 bg-transparent text-xs sm:text-sm text-white placeholder:text-slate-500 focus:outline-none"
-                />
-              </div>
+            <div className="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center sm:justify-between">
+              <button
+                type="button"
+                onClick={() => setShowSearch((prev) => !prev)}
+                className={`inline-flex items-center justify-center gap-2 self-start sm:self-auto rounded-2xl border px-4 py-2.5 text-xs font-bold uppercase tracking-[0.3em] transition ${
+                  showSearch
+                    ? 'border-emerald-400/50 bg-emerald-500 text-slate-950'
+                    : 'border-white/10 bg-slate-900/70 text-slate-200 hover:bg-slate-900'
+                }`}
+                aria-label="Toggle case study search"
+                aria-expanded={showSearch}
+              >
+                <Search className="w-4 h-4" />
+                <span className="hidden sm:inline">Search</span>
+              </button>
+
+              {showSearch && (
+                <div className="flex flex-1 items-center bg-slate-900/70 rounded-2xl border border-white/10 px-3 py-2 sm:py-2.5">
+                  <Search className="w-4 h-4 text-slate-400 shrink-0" />
+                  <input
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    placeholder="Search case studies..."
+                    className="ml-2 flex-1 bg-transparent text-xs sm:text-sm text-white placeholder:text-slate-500 focus:outline-none"
+                  />
+                </div>
+              )}
             </div>
             <div className="flex flex-wrap gap-2 text-xs uppercase tracking-[0.3em]">
               {FILTERS.map((filter) => (

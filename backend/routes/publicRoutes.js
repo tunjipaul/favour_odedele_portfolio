@@ -5,6 +5,7 @@ import {
   getMetrics,
   getExpertise,
   getSettings,
+  serveCv,
   joinWaitlist,
 } from '../controllers/contentController.js';
 
@@ -17,6 +18,7 @@ router.get('/gallery', getGalleryItems);
 router.get('/metrics', getMetrics);
 router.get('/expertise', getExpertise);
 router.get('/settings', getSettings);
+router.get('/cv', serveCv);
 router.post('/waitlist', joinWaitlist); // Book waitlist form submission
 
 export default router;

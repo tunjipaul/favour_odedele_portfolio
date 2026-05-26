@@ -13,13 +13,22 @@ cloudinaryV2.config({
 });
 
 // CloudinaryStorage tells multer: instead of saving files to disk,
-// stream them directly to Cloudinary and return the URL
+// stream them directly to Cloudinary and return the URL.
+// PDFs need raw uploads; images keep the usual optimized transformation.
 const storage = new CloudinaryStorage({
   cloudinary: cloudinaryV2,
-  params: {
-    folder: 'favour-portfolio', // All uploads go into this Cloudinary folder
-    allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'pdf'],
-    transformation: [{ width: 1200, quality: 'auto', fetch_format: 'auto' }],
+  params: async (_req, file) => {
+    const fileName = (file.originalname || '').toLowerCase();
+    const isPdf = file.mimetype === 'application/pdf' || fileName.endsWith('.pdf');
+
+    return {
+      folder: 'favour-portfolio',
+      resource_type: isPdf ? 'raw' : 'image',
+      allowed_formats: isPdf ? ['pdf'] : ['jpg', 'jpeg', 'png', 'webp'],
+      ...(isPdf
+        ? {}
+        : { transformation: [{ width: 1200, quality: 'auto', fetch_format: 'auto' }] }),
+    };
   },
 });
 

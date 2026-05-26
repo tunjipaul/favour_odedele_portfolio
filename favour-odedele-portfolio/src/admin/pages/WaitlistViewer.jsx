@@ -1,24 +1,14 @@
 import { useEffect, useState } from 'react';
 import { api } from '../utils/api';
 import { Mail } from 'lucide-react';
+import { DEFAULT_BOOK_SETTINGS, normalizeBookSettings } from '../../data/bookSettings.js';
 
 const formatDate = (iso) =>
   new Date(iso).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' });
 
-const EMPTY_BOOK = {
-  title: '',
-  teaser: '',
-  progress: 0,
-  stats: [
-    { label: 'Days Left', target: 0 },
-    { label: 'Chapters Done', target: 0 },
-    { label: 'Key Pillars', target: 0 },
-  ],
-};
-
 export default function WaitlistViewer() {
   const [entries, setEntries] = useState([]);
-  const [book, setBook] = useState(EMPTY_BOOK);
+  const [book, setBook] = useState(DEFAULT_BOOK_SETTINGS);
   const [loading, setLoading] = useState(true);
   const [savingBook, setSavingBook] = useState(false);
   const [msg, setMsg] = useState('');
@@ -36,11 +26,7 @@ export default function WaitlistViewer() {
           api.get('/admin/settings'),
         ]);
         setEntries(Array.isArray(waitlistData) ? waitlistData : []);
-        setBook({
-          ...EMPTY_BOOK,
-          ...(settingsData?.book || {}),
-          stats: settingsData?.book?.stats?.length ? settingsData.book.stats : EMPTY_BOOK.stats,
-        });
+        setBook(normalizeBookSettings(settingsData?.book));
       } catch (error) {
         console.error('Failed to load waitlist and book settings', error);
       } finally {
@@ -130,7 +116,7 @@ export default function WaitlistViewer() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
-              {(book.stats || EMPTY_BOOK.stats).slice(0, 3).map((stat, index) => (
+              {(book.stats || DEFAULT_BOOK_SETTINGS.stats).slice(0, 3).map((stat, index) => (
                 <div key={index} className="bg-slate-950/40 border border-white/10 rounded-lg p-3 space-y-2">
                   <label className="block text-[10px] sm:text-xs uppercase tracking-wider text-slate-400">Stat Label</label>
                   <input
@@ -163,7 +149,7 @@ export default function WaitlistViewer() {
           <div className="flex flex-col gap-3 sm:gap-4 mb-4 sm:mb-5">
             <div>
               <p className="text-[10px] sm:text-xs uppercase tracking-[0.3em] sm:tracking-[0.4em] text-slate-400">Current signups</p>
-              <h2 className="text-lg sm:text-xl font-semibold">{entries.length} readers</h2>
+              <h2 className="text-lg sm:text-xl font-semibold">{entries.length} signups</h2>
             </div>
             <button className="w-full sm:w-auto flex items-center justify-center sm:justify-start gap-2 rounded-xl border border-white/20 px-4 py-2 text-[10px] sm:text-xs uppercase tracking-[0.2em] sm:tracking-[0.3em] text-slate-200 hover:border-white/40">
               <Mail className="w-4 h-4" />
@@ -180,7 +166,6 @@ export default function WaitlistViewer() {
               <table className="w-full text-left text-xs sm:text-sm">
                 <thead className="text-slate-400 text-[10px] sm:text-xs uppercase tracking-[0.3em] sm:tracking-[0.35em] bg-slate-950/40">
                   <tr>
-                    <th className="px-3 sm:px-4 py-2 sm:py-3 whitespace-nowrap">Name</th>
                     <th className="px-3 sm:px-4 py-2 sm:py-3 whitespace-nowrap">Email</th>
                     <th className="px-3 sm:px-4 py-2 sm:py-3 whitespace-nowrap hidden sm:table-cell">Sign-up date</th>
                   </tr>
@@ -188,7 +173,6 @@ export default function WaitlistViewer() {
                 <tbody className="divide-y divide-white/5">
                   {entries.map((entry, index) => (
                     <tr key={entry._id ?? index} className="hover:bg-white/5 transition-colors">
-                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-slate-100 text-xs sm:text-sm">{entry.name || 'Anonymous Reader'}</td>
                       <td className="px-3 sm:px-4 py-2 sm:py-3 text-slate-300 lowercase text-xs sm:text-sm">
                         <a href={`mailto:${entry.email}`} className="hover:text-white break-all">
                           {entry.email}

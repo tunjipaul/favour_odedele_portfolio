@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { authApi } from './admin/utils/api';
+import { API_BASE_URL } from './config.js';
 
 // Public portfolio sections
 import Navbar from './components/Layout/Navbar';
@@ -34,8 +35,8 @@ export default function App() {
   useEffect(() => {
     const ping = async () => {
       try {
-        await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api'}/health`);
-      } catch (e) {
+        await fetch(`${API_BASE_URL}/health`);
+      } catch {
         // Silently fail, just a keep-alive
       }
     };

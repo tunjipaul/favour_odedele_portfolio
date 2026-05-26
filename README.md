@@ -31,6 +31,8 @@ Backend: `backend/.env`
 - `JWT_SECRET` (required)
 - `JWT_EXPIRES_IN` (optional, e.g. `7d`)
 - `FRONTEND_URL` (optional, for CORS allowlist)
+- `RESEND_API_KEY` (optional, enables waitlist confirmation emails)
+- `RESEND_FROM_EMAIL` (required for waitlist confirmation emails, e.g. `waitlist@yourdomain.com`)
 - `CLOUDINARY_CLOUD_NAME` (required for uploads)
 - `CLOUDINARY_API_KEY` (required for uploads)
 - `CLOUDINARY_API_SECRET` (required for uploads)
@@ -78,6 +80,7 @@ npm run dev
 1. Deploy `backend/` to your Node host.
 2. Set all backend env vars in the hosting dashboard.
 3. Set `FRONTEND_URL` to your production frontend origin.
+4. Set `RESEND_API_KEY` and `RESEND_FROM_EMAIL` if you want waitlist emails.
 
 - Frontend
 1. Set `VITE_API_BASE_URL` to your deployed API base.

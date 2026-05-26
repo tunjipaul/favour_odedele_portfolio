@@ -2,6 +2,8 @@ import Metric from '../models/Metric.js';
 import ExpertisePillar from '../models/ExpertisePillar.js';
 import SiteSettings from '../models/SiteSettings.js';
 import WaitlistEntry from '../models/WaitlistEntry.js';
+import { sendWaitlistConfirmationEmail } from '../services/resendService.js';
+import { Readable } from 'node:stream';
 
 // ─── METRICS ───────────────────────────────────────────────────────────────
 
@@ -136,12 +138,27 @@ export const joinWaitlist = async (req, res) => {
 
     // Prevent duplicate entries
     const existing = await WaitlistEntry.findOne({ email });
-    if (existing) {
-      return res.status(200).json({ message: "You're already on the waitlist!" });
+    const settings = await SiteSettings.findOne();
+    const bookTitle = settings?.book?.title || 'Success Leaves Cues';
+
+    let entry = existing;
+    if (!existing) {
+      entry = await WaitlistEntry.create({ email, name });
     }
 
-    const entry = await WaitlistEntry.create({ email, name });
-    res.status(201).json({ message: "You're on the waitlist!", entry });
+    let emailSent = false;
+    try {
+      const result = await sendWaitlistConfirmationEmail({ email, name, bookTitle });
+      emailSent = Boolean(result?.sent);
+    } catch (emailError) {
+      console.error('Resend waitlist email error:', emailError);
+    }
+
+    res.status(existing ? 200 : 201).json({
+      message: existing ? "You're already on the waitlist!" : "You're on the waitlist!",
+      entry,
+      emailSent,
+    });
   } catch (error) {
     console.error('ContentController.joinWaitlist error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
@@ -155,6 +172,43 @@ export const getWaitlist = async (req, res) => {
     res.json(entries);
   } catch (error) {
     console.error('ContentController.getWaitlist error:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+export const serveCv = async (req, res) => {
+  try {
+    const settings = await SiteSettings.findOne();
+    const cvUrl = settings?.hero?.cvUrl;
+
+    if (!cvUrl) {
+      return res.status(404).json({ message: 'CV not found' });
+    }
+
+    const response = await fetch(cvUrl);
+    if (!response.ok || !response.body) {
+      return res.status(502).json({ message: 'Failed to fetch CV file' });
+    }
+
+    const filename = "Favor Odedele's CV.pdf";
+    const encodedFilename = encodeURIComponent(filename).replace(/[!'()*]/g, (char) =>
+      `%${char.charCodeAt(0).toString(16).toUpperCase()}`
+    );
+    const wantsDownload = req.query.download === '1' || req.query.download === 'true';
+
+    res.setHeader('Content-Type', 'application/pdf');
+    res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
+    res.setHeader(
+      'Content-Disposition',
+      `${wantsDownload ? 'attachment' : 'inline'}; filename="${filename}"; filename*=UTF-8''${encodedFilename}`
+    );
+
+    const stream = Readable.fromWeb(response.body);
+    stream.pipe(res);
+  } catch (error) {
+    console.error('ContentController.serveCv error:', error);
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };

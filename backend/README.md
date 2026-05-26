@@ -26,6 +26,8 @@ Create `backend/.env` with:
 - `JWT_SECRET` (required)
 - `JWT_EXPIRES_IN` (optional, e.g. `7d`)
 - `FRONTEND_URL` (optional, adds to CORS allowlist)
+- `RESEND_API_KEY` (optional, enables waitlist confirmation emails)
+- `RESEND_FROM_EMAIL` (required for waitlist confirmation emails, e.g. `waitlist@yourdomain.com`)
 - `CLOUDINARY_CLOUD_NAME` (required for uploads)
 - `CLOUDINARY_API_KEY` (required for uploads)
 - `CLOUDINARY_API_SECRET` (required for uploads)
@@ -61,6 +63,8 @@ Public (no auth):
 - `GET /api/expertise`
 - `GET /api/settings`
 - `POST /api/waitlist`
+  - Stores the email in MongoDB.
+  - Sends a confirmation email through Resend when `RESEND_API_KEY` and `RESEND_FROM_EMAIL` are set.
 
 Auth:
 - `POST /api/auth/login`
@@ -102,3 +106,4 @@ Allowed origins include:
 **Uploads**
 - Upload endpoint accepts a single file field named `image`.
 - Files are stored in Cloudinary under the `favour-portfolio` folder.
+- PDFs are uploaded as raw Cloudinary assets so the CV remains a PDF instead of being transformed into an image.

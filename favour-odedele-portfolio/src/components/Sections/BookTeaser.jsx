@@ -3,26 +3,62 @@ import useStore from '../../store/useStore';
 import Modal from '../UI/Modal';
 import { useState, useEffect, useRef } from 'react';
 import { API_BASE_URL } from '../../config.js';
+import { DEFAULT_BOOK_SETTINGS, normalizeBookSettings } from '../../data/bookSettings.js';
 
 const API = API_BASE_URL;
-
-const STATS = [
-  { label: 'Days Left', target: 45 },
-  { label: 'Chapters Done', target: 7 },
-  { label: 'Key Pillars', target: 4 },
-];
 
 const easeOutQuart = (t) => 1 - Math.pow(1 - t, 4);
 
 export default function BookTeaser() {
   const { isWaitlistOpen, toggleWaitlist } = useStore();
+  const [book, setBook] = useState(DEFAULT_BOOK_SETTINGS);
   const [email, setEmail] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
+  const [confirmationMessage, setConfirmationMessage] = useState('');
   const sectionRef = useRef(null);
   const [bookAnimationState, setBookAnimationState] = useState('closed');
   const [progressWidth, setProgressWidth] = useState(0);
   const [statCounts, setStatCounts] = useState([0, 0, 0]);
   const [statsAnimated, setStatsAnimated] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
+  const bookRef = useRef(DEFAULT_BOOK_SETTINGS);
+  const bookTitle = book.title || DEFAULT_BOOK_SETTINGS.title;
+
+  useEffect(() => {
+    bookRef.current = book;
+  }, [book]);
+
+  useEffect(() => {
+    const updateViewport = () => {
+      setIsDesktop(window.innerWidth >= 1024);
+    };
+
+    updateViewport();
+    window.addEventListener('resize', updateViewport);
+    return () => window.removeEventListener('resize', updateViewport);
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+
+    const loadBookSettings = async () => {
+      try {
+        const data = await fetch(`${API}/settings`).then((res) => res.json());
+        if (!active) return;
+
+        setBook(normalizeBookSettings(data?.book));
+      } catch {
+        if (active) setBook(DEFAULT_BOOK_SETTINGS);
+      }
+    };
+
+    loadBookSettings();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -55,11 +91,12 @@ export default function BookTeaser() {
     const duration = 4000; // slow: 4 seconds
     const frameRate = 1000 / 60;
     const totalFrames = Math.round(duration / frameRate);
+    const targetProgress = Number(bookRef.current.progress ?? DEFAULT_BOOK_SETTINGS.progress);
     let frame = 0;
     const interval = setInterval(() => {
       frame++;
       const progress = easeOutQuart(frame / totalFrames);
-      setProgressWidth(Math.round(progress * 70)); // target: 70%
+      setProgressWidth(Math.round(progress * targetProgress));
       if (frame === totalFrames) clearInterval(interval);
     }, frameRate);
   };
@@ -72,41 +109,59 @@ export default function BookTeaser() {
     const interval = setInterval(() => {
       frame++;
       const progress = easeOutQuart(frame / totalFrames);
-      setStatCounts(STATS.map((s) => Math.round(progress * s.target)));
+      setStatCounts(bookRef.current.stats.map((s) => Math.round(progress * (s.target || 0))));
       if (frame === totalFrames) clearInterval(interval);
     }, frameRate);
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Try to save to backend — silently continue even if it fails
+    setIsSubmitting(true);
+    setSubmitError('');
+
     try {
-      await fetch('http://localhost:5000/api/waitlist', {
+      const response = await fetch(`${API}/waitlist`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+        },
         body: JSON.stringify({ email }),
       });
-    } catch {
-      // API unreachable — still show success to the user
+
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) {
+        throw new Error(data.message || 'Something went wrong, try again');
+      }
+
+      setConfirmationMessage(
+        data.emailSent
+          ? 'Check your inbox for a confirmation email.'
+          : 'You are on the list, but email delivery is not configured yet.'
+      );
+      setIsSubmitted(true);
+      setEmail('');
+      setTimeout(() => {
+        setIsSubmitted(false);
+        setConfirmationMessage('');
+        toggleWaitlist();
+      }, 3000);
+    } catch (error) {
+      setSubmitError(error.message || 'Something went wrong, try again');
     }
-    setIsSubmitted(true);
-    setEmail('');
-    // Auto-close after 3 seconds
-    setTimeout(() => {
-      setIsSubmitted(false);
-      toggleWaitlist();
-    }, 3000);
+    setIsSubmitting(false);
   };
 
   const handleClose = () => {
     setIsSubmitted(false);
+    setConfirmationMessage('');
     toggleWaitlist();
   };
 
   return (
     <section 
       ref={sectionRef}
-      className="py-12 sm:py-16 md:py-20 lg:py-24 text-white relative overflow-hidden bg-background-dark" 
+      className="py-12 sm:py-16 md:py-20 lg:py-24 text-white relative overflow-hidden bg-background-dark"
       id="book"
     >
       {/* Giant Book Icon Background */}
@@ -135,7 +190,11 @@ export default function BookTeaser() {
       {/* Content - fades in after book opens */}
       <div 
         className={`max-w-7xl mx-auto px-4 sm:px-6 relative z-10 transition-all duration-1000 ${
-          bookAnimationState === 'opened' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'
+          isDesktop
+            ? bookAnimationState === 'opened'
+              ? 'opacity-100 translate-y-0'
+              : 'opacity-0 translate-y-10'
+            : 'opacity-100 translate-y-0'
         }`}
       >
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-12 md:gap-16 lg:gap-20 items-center">
@@ -145,11 +204,13 @@ export default function BookTeaser() {
               Upcoming Publication
             </h2>
             <h3 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-6 sm:mb-8 leading-tight font-serif">
-              Success Leaves <span className="italic">Cues</span>
+              {(book.title || DEFAULT_BOOK_SETTINGS.title).split(' ')[0] || 'Success'}{' '}
+              <span className="italic">
+                {(book.title || DEFAULT_BOOK_SETTINGS.title).split(' ').slice(1).join(' ') || 'Leaves Cues'}
+              </span>
             </h3>
             <p className="text-slate-400 text-base sm:text-lg mb-8 sm:mb-10 leading-relaxed max-w-lg">
-              An executive playbook on scaling operational excellence and building
-              sustainable impact in developing markets. Pre-order details coming soon.
+              {book.teaser || DEFAULT_BOOK_SETTINGS.teaser}
             </p>
 
             {/* Progress Bar */}
@@ -158,13 +219,15 @@ export default function BookTeaser() {
                 <span className="text-sm font-bold uppercase tracking-wider">
                   Manuscript Completion
                 </span>
-                <span className="text-primary font-black tabular-nums">{progressWidth}%</span>
+                <span className="text-primary font-black tabular-nums">
+                  {book.progress ?? DEFAULT_BOOK_SETTINGS.progress}%
+                </span>
               </div>
               <div className="w-full h-4 bg-slate-800 rounded-full overflow-hidden relative">
                 {/* Filled bar */}
                 <div
                   className="h-full bg-primary rounded-full transition-none relative overflow-hidden"
-                  style={{ width: `${progressWidth}%` }}
+                  style={{ width: `${progressWidth || book.progress || 0}%` }}
                 >
                   {/* Moving glow shimmer — always on, indicating ongoing work */}
                   {progressWidth > 0 && (
@@ -183,12 +246,12 @@ export default function BookTeaser() {
 
             {/* Stats */}
             <div className="flex gap-8 mt-12">
-              {STATS.map((stat, i) => (
+              {(book.stats || DEFAULT_BOOK_SETTINGS.stats).map((stat, i) => (
                 <>
                   {i > 0 && <div key={`div-${i}`} className="w-px h-12 bg-slate-800" />}
                   <div key={stat.label}>
                     <div className="text-3xl font-black text-white mb-1 tabular-nums">
-                      {String(statCounts[i]).padStart(2, '0')}
+                      {String(statCounts[i] ?? 0).padStart(2, '0')}
                     </div>
                     <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
                       {stat.label}
@@ -217,7 +280,8 @@ export default function BookTeaser() {
               <div className="text-center relative z-10">
                 <div className="w-16 h-1 bg-primary mx-auto mb-8" />
                 <h4 className="text-3xl font-black mb-4 tracking-tighter uppercase">
-                  Success <br /> Leaves Cues
+                  {(book.title || DEFAULT_BOOK_SETTINGS.title).split(' ')[0] || 'Success'} <br />
+                  {(book.title || DEFAULT_BOOK_SETTINGS.title).split(' ').slice(1).join(' ') || 'Leaves Cues'}
                 </h4>
                 <p className="text-slate-500 text-sm font-bold tracking-widest uppercase">
                   By Favor Odedele
@@ -245,13 +309,18 @@ export default function BookTeaser() {
             </div>
             <h4 className="text-xl font-bold text-slate-900 mb-2">You're on the list!</h4>
             <p className="text-slate-600">
-              We'll notify you when <strong>"Success Leaves Cues"</strong> is ready for pre-order.
+              We'll notify you when <strong>"{bookTitle}"</strong> is ready for pre-order.
             </p>
+            {confirmationMessage && (
+              <p className="mt-3 text-sm font-medium text-emerald-700">
+                {confirmationMessage}
+              </p>
+            )}
           </div>
         ) : (
           <div className="space-y-6">
             <p className="text-slate-600 leading-relaxed">
-              Be the first to know when <strong>"Success Leaves Cues"</strong> is
+              Be the first to know when <strong>"{bookTitle}"</strong> is
               available. Get exclusive early access and launch day discounts.
             </p>
             <form onSubmit={handleSubmit} className="space-y-4">
@@ -263,11 +332,17 @@ export default function BookTeaser() {
                 required
                 className="w-full px-4 py-3 rounded-xl border border-slate-200 text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
               />
+              {submitError && (
+                <p className="text-sm text-red-600 font-medium">
+                  {submitError}
+                </p>
+              )}
               <button
                 type="submit"
-                className="w-full bg-primary hover:bg-primary-dark text-white py-3 rounded-xl font-bold transition-all"
+                disabled={isSubmitting}
+                className="w-full bg-primary hover:bg-primary-dark disabled:opacity-60 disabled:cursor-not-allowed text-white py-3 rounded-xl font-bold transition-all"
               >
-                Notify Me
+                {isSubmitting ? 'Submitting...' : 'Notify Me'}
               </button>
             </form>
           </div>

@@ -4,8 +4,9 @@ import ProjectCard from '../UI/ProjectCard';
 import Modal from '../UI/Modal';
 import useStore from '../../store/useStore';
 import { MapPin, Briefcase, Target, Trophy } from 'lucide-react';
+import { API_BASE_URL } from '../../config.js';
 
-const API = 'http://localhost:5000/api';
+const API = API_BASE_URL;
 
 export default function CaseStudies() {
   const { activeProject, closeProject } = useStore();

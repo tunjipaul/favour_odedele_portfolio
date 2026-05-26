@@ -76,7 +76,8 @@ export default function Footer() {
 
   const mailHref = contacts.email ? `mailto:${contacts.email}` : 'mailto:favor@example.com';
   const linkedInHref = contacts.linkedIn || '#';
-  const bookCallHref = contacts.bookCall || '#';
+  const normalizedPhone = (contacts.bookCall || '').trim().replace(/[^\d+]/g, '');
+  const bookCallHref = normalizedPhone ? `tel:${normalizedPhone}` : '#';
   const twitterHref = contacts.twitter || '#';
   const substackHref = contacts.substack || '#';
 
@@ -122,8 +123,6 @@ export default function Footer() {
             </a>
             <a
               href={bookCallHref}
-              target="_blank"
-              rel="noopener noreferrer"
               className="flex items-center justify-center gap-3 px-6 sm:px-8 py-3 sm:py-4 bg-accent-magenta text-white rounded-2xl hover:scale-105 transition-all shadow-xl"
             >
               <CalendarDays className="w-5 h-5" />
@@ -155,8 +154,19 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="flex flex-col items-center justify-center border-t border-slate-200 pt-8 sm:pt-12 gap-6 sm:gap-8">
           <div className="flex items-center gap-3 opacity-60">
-            <div className="w-8 h-8 bg-slate-400 rounded flex items-center justify-center text-white">
-              <Star className="w-4 h-4 fill-current" />
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-300 via-rose-500 to-cyan-400 p-[1px] shadow-lg shadow-rose-400/20">
+              <div className="w-full h-full rounded-[10px] bg-background-muted flex items-center justify-center">
+                <Star className="w-4 h-4" fill="url(#footerStarGradient)" stroke="none" />
+                <svg width="0" height="0" aria-hidden="true" focusable="false">
+                  <defs>
+                    <linearGradient id="footerStarGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#f59e0b" />
+                      <stop offset="50%" stopColor="#ec4899" />
+                      <stop offset="100%" stopColor="#06b6d4" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+              </div>
             </div>
             <span className="font-black uppercase tracking-widest text-xs group cursor-default text-center">
               <span className="transition-colors duration-300 hover:text-primary">Favor</span>

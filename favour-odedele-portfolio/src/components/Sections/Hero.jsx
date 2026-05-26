@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { API_BASE_URL } from '../../config.js';
 
 const FALLBACK_NAME = 'FAVOR ODEDELE';
@@ -13,13 +13,15 @@ export default function Hero() {
     fullName: FALLBACK_NAME, 
     bioText: FALLBACK_BIO, 
     portrait: FALLBACK_PORTRAIT,
-    cvUrl: '/cv.pdf'
+    cvUrl: '',
   });
   const [cardVisible, setCardVisible] = useState(false);
   const [typedCount, setTypedCount] = useState(0);
   const [cycleIndex, setCycleIndex] = useState(0);
   const [bioCount, setBioCount] = useState(0);
   const [bioVisible, setBioVisible] = useState(false);
+  const [cvToast, setCvToast] = useState('');
+  const toastTimerRef = useRef(null);
 
   const scrollToSection = (sectionId) => {
     const element = document.getElementById(sectionId);
@@ -42,6 +44,7 @@ export default function Hero() {
     backgroundImage: 'radial-gradient(rgba(255,255,255,0.35) 1px, transparent 1px)',
     backgroundSize: '10px 10px',
   };
+  const cvDownloadUrl = `${API_BASE_URL}/cv?download=1`;
 
   useEffect(() => {
     // Fetch settings from backend
@@ -54,7 +57,7 @@ export default function Hero() {
             fullName: data.hero.fullName || FALLBACK_NAME,
             bioText: data.hero.bioText || FALLBACK_BIO,
             portrait: data.hero.portrait || FALLBACK_PORTRAIT,
-            cvUrl: data.hero.cvUrl || '/cv.pdf'
+            cvUrl: data.hero.cvUrl || '',
           });
         }
       } catch (err) {
@@ -70,6 +73,32 @@ export default function Hero() {
 
   const fullName = settings.fullName.toUpperCase();
   const bioText = settings.bioText;
+  const hasCv = Boolean(settings.cvUrl);
+
+  const handleCvClick = () => {
+    if (hasCv) {
+      window.location.href = cvDownloadUrl;
+      return;
+    }
+
+    if (toastTimerRef.current) {
+      clearTimeout(toastTimerRef.current);
+    }
+
+    setCvToast('CV not available yet. Contact Favour via the social links below.');
+    toastTimerRef.current = setTimeout(() => {
+      setCvToast('');
+      toastTimerRef.current = null;
+    }, 3500);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (toastTimerRef.current) {
+        clearTimeout(toastTimerRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (!cardVisible) return;
@@ -146,9 +175,20 @@ export default function Hero() {
         </div>
         <div className="bg-[#948a66] px-6 py-8 flex flex-col gap-4">
           <p className="text-white text-sm font-medium leading-relaxed max-w-sm">{settings.bioText}</p>
-          <div className="flex gap-3 flex-wrap">
-            <a href={settings.cvUrl} download className="inline-block bg-white text-background-dark px-5 py-2 text-xs font-bold uppercase tracking-widest hover:bg-accent-magenta hover:text-white transition-all duration-300">Download CV</a>
+          <div className="relative flex gap-3 flex-wrap">
+            <button
+              type="button"
+              onClick={handleCvClick}
+              className="inline-block bg-white text-background-dark px-5 py-2 text-xs font-bold uppercase tracking-widest hover:bg-accent-magenta hover:text-white transition-all duration-300"
+            >
+              Download CV
+            </button>
             <button onClick={() => scrollToSection('case-studies')} className="inline-block border border-white/60 text-white px-5 py-2 text-xs font-bold uppercase tracking-widest hover:bg-white/10 transition-all duration-300">View Work</button>
+            {cvToast && (
+              <div className="absolute left-0 bottom-full mb-3 inline-flex max-w-sm rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-left text-xs text-white/90 shadow-xl backdrop-blur-sm">
+                {cvToast}
+              </div>
+            )}
           </div>
         </div>
         <div className="bg-background-dark h-8 mt-auto" />
@@ -211,13 +251,20 @@ export default function Hero() {
                     <span className="inline-block w-0.5 h-4 bg-white ml-0.5 animate-blink align-middle" />
                   )}
                 </p>
-                <a
-                  href={settings.cvUrl}
-                  download
-                  className="inline-block bg-white text-background-dark px-6 py-2 text-xs font-bold uppercase tracking-widest hover:bg-accent-magenta hover:text-white transition-all duration-300"
-                >
-                  Download CV
-                </a>
+                <div className="relative inline-flex">
+                  <button
+                    type="button"
+                    onClick={handleCvClick}
+                    className="inline-block bg-white text-background-dark px-6 py-2 text-xs font-bold uppercase tracking-widest hover:bg-accent-magenta hover:text-white transition-all duration-300"
+                  >
+                    Download CV
+                  </button>
+                  {cvToast && (
+                    <div className="absolute left-0 bottom-full mb-3 z-50 max-w-sm rounded-2xl border border-white/15 bg-white/10 px-4 py-3 text-xs text-white/90 shadow-2xl backdrop-blur-sm">
+                      {cvToast}
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Portrait */}
