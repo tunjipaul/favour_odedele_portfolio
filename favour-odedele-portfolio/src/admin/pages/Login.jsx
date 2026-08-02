@@ -32,7 +32,7 @@ export default function Login() {
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 items-center">
         <div className="flex-1 text-center rounded-3xl border border-white/10 bg-white/10 p-8 text-white shadow-2xl lg:text-left">
           <p className="text-xs uppercase tracking-[0.4em] text-emerald-300">Admin Portal</p>
-          <h1 className="mt-4 text-4xl font-black">Welcome back, Favor Odedele</h1>
+          <h1 className="mt-4 text-4xl font-black">Welcome back, Favour Odedele</h1>
           <p className="mt-4 text-sm text-white/70">
             Log in to manage the portfolio, monitor case studies, and keep the waitlist updated. The layout scales from mobile to desktop so you can sign in anywhere.
           </p>
@@ -97,3 +97,4 @@ export default function Login() {
     </div>
   );
 }
+

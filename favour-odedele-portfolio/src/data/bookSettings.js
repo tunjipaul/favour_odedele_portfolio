@@ -1,26 +1,18 @@
 export const DEFAULT_BOOK_SETTINGS = {
-  title: 'Success Leaves Cues',
+  title: 'Becoming the 1%',
   teaser:
-    'An executive playbook on scaling operational excellence and building sustainable impact in developing markets. Pre-order details coming soon.',
-  progress: 70,
+    'A personal book on discipline, identity, excellence, and the quiet decisions that shape who we become.',
+  coverUrl: '/images/placeholder-audacity.jpg',
+  pdfUrl: '',
+  progress: 0,
   stats: [
-    { label: 'Days Left', target: 45 },
-    { label: 'Chapters Done', target: 7 },
-    { label: 'Key Pillars', target: 4 },
+    { label: 'Book Notes', target: 1 },
+    { label: 'Reader Updates', target: 1 },
+    { label: 'Community', target: 1 },
   ],
 };
 
-export const normalizeBookSettings = (book = {}) => {
-  const stats = Array.isArray(book.stats) && book.stats.length
-    ? book.stats.slice(0, 3).map((stat, index) => ({
-        ...DEFAULT_BOOK_SETTINGS.stats[index],
-        ...stat,
-      }))
-    : DEFAULT_BOOK_SETTINGS.stats;
-
-  return {
-    ...DEFAULT_BOOK_SETTINGS,
-    ...book,
-    stats,
-  };
-};
+export const normalizeBookSettings = (book = {}) => ({
+  ...DEFAULT_BOOK_SETTINGS,
+  ...book,
+});

@@ -1,6 +1,6 @@
-# Favor Odedele Portfolio (Frontend + Admin + API)
+# Favour Odedele Personal Brand Platform
 
-End-to-end portfolio platform with a public site, an admin panel, and a Node/Express API backed by MongoDB and Cloudinary.
+End-to-end personal brand platform with a public site, admin panel, and Node/Express API backed by MongoDB and Cloudinary.
 
 **Quick links**
 - Frontend: `favour-odedele-portfolio/`
@@ -8,21 +8,33 @@ End-to-end portfolio platform with a public site, an admin panel, and a Node/Exp
 
 **High-level stack**
 - Frontend: Vite, React, Tailwind CSS, React Router, Zustand
-- Backend: Node, Express, MongoDB (Mongoose), JWT auth, Multer + Cloudinary
+- Backend: Node, Express, MongoDB (Mongoose), JWT auth, Multer + Cloudinary, optional Resend email
 
 **Repository structure**
-```
+```text
 .
-|-- favour-odedele-portfolio/   # Frontend + admin panel (Vite)
+|-- favour-odedele-portfolio/   # Public site + admin panel (Vite)
 |-- backend/                    # API server
 |-- README.md                   # You are here
 ```
 
+**Current positioning**
+The site is a personal brand, author, and community platform for Favour Odedele. It focuses on:
+- Hero
+- About Me
+- Three Highlights
+- My Book: Becoming the 1%
+- Community
+- Gallery
+- Contact
+
+Legacy career-portfolio surfaces have been removed in favor of a focused personal-brand experience.
+
 **Prerequisites**
 - Node.js 18+ recommended
 - npm 9+ recommended
-- MongoDB Atlas (or a local MongoDB instance)
-- Cloudinary account (for image uploads)
+- MongoDB Atlas or local MongoDB
+- Cloudinary account for image and PDF uploads
 
 **Environment variables**
 
@@ -31,8 +43,8 @@ Backend: `backend/.env`
 - `JWT_SECRET` (required)
 - `JWT_EXPIRES_IN` (optional, e.g. `7d`)
 - `FRONTEND_URL` (optional, for CORS allowlist)
-- `RESEND_API_KEY` (optional, enables waitlist confirmation emails)
-- `RESEND_FROM_EMAIL` (required for waitlist confirmation emails, e.g. `waitlist@yourdomain.com`)
+- `RESEND_API_KEY` (optional, enables community confirmation emails)
+- `RESEND_FROM_EMAIL` (required when Resend is enabled)
 - `CLOUDINARY_CLOUD_NAME` (required for uploads)
 - `CLOUDINARY_API_KEY` (required for uploads)
 - `CLOUDINARY_API_SECRET` (required for uploads)
@@ -45,55 +57,39 @@ Frontend: `favour-odedele-portfolio/.env`
 
 **Local development**
 
-1. Start the backend
-```
+Start the backend:
+```bash
 cd backend
 npm install
 npm run dev
 ```
 
-2. (Optional) Seed the database
-```
+Seed the database:
+```bash
 cd backend
 npm run seed
 ```
 
-3. Start the frontend
-```
+Start the frontend:
+```bash
 cd favour-odedele-portfolio
 npm install
 npm run dev
 ```
 
-4. Open in browser
+Open in browser:
 - Public site: `http://localhost:5173`
 - Admin login: `http://localhost:5173/admin/login`
 
 **API overview**
 - Health: `GET /api/health`
-- Public: `GET /api/projects`, `GET /api/gallery`, `GET /api/metrics`, `GET /api/expertise`, `GET /api/settings`, `POST /api/waitlist`
+- Public: `GET /api/projects`, `GET /api/gallery`, `GET /api/settings`, `POST /api/waitlist`
 - Auth: `POST /api/auth/login`
-- Admin (JWT): `/api/admin/*` CRUD for projects, gallery, metrics, expertise, settings, waitlist, and uploads
-
-**Deployment**
-- Backend
-1. Deploy `backend/` to your Node host.
-2. Set all backend env vars in the hosting dashboard.
-3. Set `FRONTEND_URL` to your production frontend origin.
-4. Set `RESEND_API_KEY` and `RESEND_FROM_EMAIL` if you want waitlist emails.
-
-- Frontend
-1. Set `VITE_API_BASE_URL` to your deployed API base.
-2. Build and deploy.
-```
-cd favour-odedele-portfolio
-npm run build
-```
+- Admin: CRUD for highlights, gallery, settings, community subscribers, and uploads
 
 **Notes**
-- The admin panel uses JWT stored in `localStorage`.
-- Image uploads go directly to Cloudinary from the API server.
+- Admin JWT is stored in `localStorage` as `adminToken`.
+- `Project` documents are now used as homepage highlights with `category: "highlight"`.
+- `WaitlistEntry` documents are now community subscribers.
+- Uploads use the admin upload endpoint with multipart field name `image`.
 
-**More docs**
-- Frontend README: `favour-odedele-portfolio/README.md`
-- Backend README: `backend/README.md`

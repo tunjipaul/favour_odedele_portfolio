@@ -7,11 +7,11 @@ import { API_BASE_URL } from './config.js';
 import Navbar from './components/Layout/Navbar';
 import Footer from './components/Layout/Footer';
 import Hero from './components/Sections/Hero';
-import Expertise from './components/Sections/Expertise';
-import ImpactMetrics from './components/Sections/ImpactMetrics';
-import CaseStudies from './components/Sections/CaseStudies';
+import AboutMe from './components/Sections/Expertise';
+import Highlights from './components/Sections/CaseStudies';
 import BookTeaser from './components/Sections/BookTeaser';
 import Gallery from './components/Sections/Gallery';
+import Community from './components/Sections/Community';
 
 // Admin pages
 import AdminLayout from './admin/AdminLayout';
@@ -19,8 +19,6 @@ import Login from './admin/pages/Login';
 import Dashboard from './admin/pages/Dashboard';
 import ProjectsManager from './admin/pages/ProjectsManager';
 import GalleryManager from './admin/pages/GalleryManager';
-import MetricsEditor from './admin/pages/MetricsEditor';
-import ExpertiseEditor from './admin/pages/ExpertiseEditor';
 import SettingsEditor from './admin/pages/SettingsEditor';
 import WaitlistViewer from './admin/pages/WaitlistViewer';
 import FrontPageEditor from './admin/pages/FrontPageEditor';
@@ -59,10 +57,10 @@ export default function App() {
             <Navbar />
             <main>
               <Hero />
-              <Expertise />
-              <ImpactMetrics />
-              <CaseStudies />
+              <AboutMe />
+              <Highlights />
               <BookTeaser />
+              <Community />
               <Gallery />
             </main>
             <Footer />
@@ -85,8 +83,7 @@ export default function App() {
         <Route index element={<Navigate to="/admin/dashboard" replace />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="front-page" element={<FrontPageEditor />} />
-        <Route path="expertise" element={<ExpertiseEditor />} />
-        <Route path="metrics" element={<MetricsEditor />} />
+
         <Route path="projects" element={<ProjectsManager />} />
         <Route path="waitlist" element={<WaitlistViewer />} />
         <Route path="gallery" element={<GalleryManager />} />
@@ -98,3 +95,6 @@ export default function App() {
     </Routes>
   );
 }
+
+
+

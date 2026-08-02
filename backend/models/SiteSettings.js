@@ -5,17 +5,18 @@ import mongoose from 'mongoose';
 const siteSettingsSchema = new mongoose.Schema(
   {
     hero: {
-      fullName: { type: String, default: 'FAVOR ODEDELE' },
+      fullName: { type: String, default: 'FAVOUR ODEDELE' },
       bioText: {
         type: String,
         default: 'Programs Manager specializing in Education, Entrepreneurship, and Human Capacity Development.',
       },
       portrait: { type: String, default: '' }, // Hero image Cloudinary URL
-      cvUrl: { type: String, default: '' }, // CV PDF Cloudinary URL
     },
     book: {
-      title: { type: String, default: 'Success Leaves Cues' },
-      teaser: { type: String, default: '' },
+      title: { type: String, default: 'Becoming the 1%' },
+      teaser: { type: String, default: 'A personal book on discipline, identity, excellence, and the quiet decisions that shape who we become.' },
+      coverUrl: { type: String, default: '' },
+      pdfUrl: { type: String, default: '' },
       progress: { type: Number, default: 70 }, // Percentage complete
       stats: [
         {
@@ -41,3 +42,6 @@ const siteSettingsSchema = new mongoose.Schema(
 
 const SiteSettings = mongoose.model('SiteSettings', siteSettingsSchema);
 export default SiteSettings;
+
+
+

@@ -1,24 +1,13 @@
 # Backend API
 
-Node/Express API for the portfolio public site and admin panel. Uses MongoDB for content, JWT for admin auth, and Cloudinary for media uploads.
+Node/Express API for Favour Odedele's personal brand platform. Uses MongoDB for editable homepage content, JWT for admin auth, Cloudinary for media uploads, and optional Resend email for community confirmations.
 
 **Tech**
 - Express
 - MongoDB + Mongoose
 - JWT auth
 - Multer + Cloudinary
-
-**Project structure**
-```
-backend/
-|-- config/        # Database connection
-|-- controllers/   # Request handlers
-|-- middleware/    # Auth and upload
-|-- models/        # Mongoose schemas
-|-- routes/        # /api, /api/auth, /api/admin
-|-- seed/          # Seed script
-|-- server.js      # App entrypoint
-```
+- Resend
 
 **Environment variables**
 Create `backend/.env` with:
@@ -26,8 +15,8 @@ Create `backend/.env` with:
 - `JWT_SECRET` (required)
 - `JWT_EXPIRES_IN` (optional, e.g. `7d`)
 - `FRONTEND_URL` (optional, adds to CORS allowlist)
-- `RESEND_API_KEY` (optional, enables waitlist confirmation emails)
-- `RESEND_FROM_EMAIL` (required for waitlist confirmation emails, e.g. `waitlist@yourdomain.com`)
+- `RESEND_API_KEY` (optional, enables community confirmation emails)
+- `RESEND_FROM_EMAIL` (required when Resend is enabled)
 - `CLOUDINARY_CLOUD_NAME` (required for uploads)
 - `CLOUDINARY_API_KEY` (required for uploads)
 - `CLOUDINARY_API_SECRET` (required for uploads)
@@ -40,31 +29,14 @@ Create `backend/.env` with:
 - `npm start` starts the API with node
 - `npm run seed` clears and seeds the database
 
-**Local run**
-```
-cd backend
-npm install
-npm run dev
-```
-
-**Seed the database**
-```
-cd backend
-npm run seed
-```
-Warning: seeding deletes existing data and recreates it.
-
 **Routes**
 
-Public (no auth):
-- `GET /api/projects`
+Public:
+- `GET /api/projects` - visible highlights only
 - `GET /api/gallery`
-- `GET /api/metrics`
-- `GET /api/expertise`
 - `GET /api/settings`
-- `POST /api/waitlist`
-  - Stores the email in MongoDB.
-  - Sends a confirmation email through Resend when `RESEND_API_KEY` and `RESEND_FROM_EMAIL` are set.
+- `POST /api/waitlist` - community subscriber signup
+- `GET /api/health`
 
 Auth:
 - `POST /api/auth/login`
@@ -78,32 +50,12 @@ Admin (JWT required):
 - `POST /api/admin/gallery`
 - `PUT /api/admin/gallery/:id`
 - `DELETE /api/admin/gallery/:id`
-- `GET /api/admin/metrics`
-- `PUT /api/admin/metrics/:id`
-- `GET /api/admin/expertise`
-- `POST /api/admin/expertise`
-- `PUT /api/admin/expertise/:id`
-- `DELETE /api/admin/expertise/:id`
 - `GET /api/admin/settings`
 - `PUT /api/admin/settings`
 - `GET /api/admin/waitlist`
 - `POST /api/admin/upload` (multipart form-data, field name `image`)
 
-Health:
-- `GET /api/health`
-
-**CORS**
-Allowed origins include:
-- `http://localhost:5173`
-- `http://localhost:5174`
-- `FRONTEND_URL` from the environment
-
-**Auth flow**
-- Admin logs in with email and password.
-- API returns a JWT.
-- Frontend stores the token and sends it as `Authorization: Bearer <token>`.
-
-**Uploads**
-- Upload endpoint accepts a single file field named `image`.
-- Files are stored in Cloudinary under the `favour-portfolio` folder.
-- PDFs are uploaded as raw Cloudinary assets so the CV remains a PDF instead of being transformed into an image.
+**Content model notes**
+- Projects are now homepage highlights. Public results are filtered to `category: "highlight"`.
+- Waitlist entries are used as community subscribers.
+- Site settings store hero copy, book title/description/cover/PDF, and contact links.

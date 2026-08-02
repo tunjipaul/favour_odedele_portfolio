@@ -1,12 +1,12 @@
-import { Mail, Linkedin, CalendarDays, Podcast, Star } from 'lucide-react';
+import { Mail, Linkedin, CalendarDays, Podcast } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { API_BASE_URL } from '../../config.js';
 
-const FULL_TEXT = "Let's Build the Future of Learning";
+const FULL_TEXT = "Ideas, writing, and community";
 const API = API_BASE_URL;
 
 const DEFAULT_CONTACTS = {
-  email: 'favor@example.com',
+  email: 'favour@example.com',
   linkedIn: '',
   bookCall: '',
   substack: '',
@@ -52,11 +52,11 @@ export default function Footer() {
     type();
   };
 
-  // Split text to highlight "Learning" in primary color
-  const beforeLearning = displayedText.includes('Learning')
-    ? displayedText.slice(0, displayedText.indexOf('Learning'))
+  // Split text to highlight "community" in primary color
+  const beforeLearning = displayedText.includes('community')
+    ? displayedText.slice(0, displayedText.indexOf('community'))
     : displayedText;
-  const learningPart = displayedText.includes('Learning') ? 'Learning' : '';
+  const learningPart = displayedText.includes('community') ? 'community' : '';
 
   useEffect(() => {
     fetch(`${API}/settings`)
@@ -74,7 +74,7 @@ export default function Footer() {
       .catch(() => {});
   }, []);
 
-  const mailHref = contacts.email ? `mailto:${contacts.email}` : 'mailto:favor@example.com';
+  const mailHref = contacts.email ? `mailto:${contacts.email}` : 'mailto:favour@example.com';
   const linkedInHref = contacts.linkedIn || '#';
   const normalizedPhone = (contacts.bookCall || '').trim().replace(/[^\d+]/g, '');
   const bookCallHref = normalizedPhone ? `tel:${normalizedPhone}` : '#';
@@ -126,7 +126,7 @@ export default function Footer() {
               className="flex items-center justify-center gap-3 px-6 sm:px-8 py-3 sm:py-4 bg-accent-magenta text-white rounded-2xl hover:scale-105 transition-all shadow-xl"
             >
               <CalendarDays className="w-5 h-5" />
-              <span className="font-bold">Book a Call</span>
+              <span className="font-bold">Call</span>
             </a>
             <a
               href={twitterHref}
@@ -137,7 +137,7 @@ export default function Footer() {
               <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.259 5.63 5.905-5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
               </svg>
-              <span className="font-bold">Twitter</span>
+              <span className="font-bold">X</span>
             </a>
             <a
               href={substackHref}
@@ -154,22 +154,8 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="flex flex-col items-center justify-center border-t border-slate-200 pt-8 sm:pt-12 gap-6 sm:gap-8">
           <div className="flex items-center gap-3 opacity-60">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-300 via-rose-500 to-cyan-400 p-[1px] shadow-lg shadow-rose-400/20">
-              <div className="w-full h-full rounded-[10px] bg-background-muted flex items-center justify-center">
-                <Star className="w-4 h-4" fill="url(#footerStarGradient)" stroke="none" />
-                <svg width="0" height="0" aria-hidden="true" focusable="false">
-                  <defs>
-                    <linearGradient id="footerStarGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                      <stop offset="0%" stopColor="#f59e0b" />
-                      <stop offset="50%" stopColor="#ec4899" />
-                      <stop offset="100%" stopColor="#06b6d4" />
-                    </linearGradient>
-                  </defs>
-                </svg>
-              </div>
-            </div>
             <span className="font-black uppercase tracking-widest text-xs group cursor-default text-center">
-              <span className="transition-colors duration-300 hover:text-primary">Favor</span>
+              <span className="transition-colors duration-300 hover:text-primary">Favour</span>
               {' '}
               <span className="transition-colors duration-300 hover:text-accent-magenta">Odedele</span>
               {' '}<span className="transition-colors duration-300 hover:text-[#1e3a5f]">© {new Date().getFullYear()}</span>
@@ -180,3 +166,5 @@ export default function Footer() {
     </footer>
   );
 }
+
+

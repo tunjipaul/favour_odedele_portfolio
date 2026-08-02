@@ -1,353 +1,134 @@
-import { BookOpen } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { BookOpen, Download, Mail } from 'lucide-react';
 import useStore from '../../store/useStore';
 import Modal from '../UI/Modal';
-import { useState, useEffect, useRef } from 'react';
 import { API_BASE_URL } from '../../config.js';
 import { DEFAULT_BOOK_SETTINGS, normalizeBookSettings } from '../../data/bookSettings.js';
-
-const API = API_BASE_URL;
-
-const easeOutQuart = (t) => 1 - Math.pow(1 - t, 4);
 
 export default function BookTeaser() {
   const { isWaitlistOpen, toggleWaitlist } = useStore();
   const [book, setBook] = useState(DEFAULT_BOOK_SETTINGS);
   const [email, setEmail] = useState('');
-  const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
   const [confirmationMessage, setConfirmationMessage] = useState('');
-  const sectionRef = useRef(null);
-  const [bookAnimationState, setBookAnimationState] = useState('closed');
-  const [progressWidth, setProgressWidth] = useState(0);
-  const [statCounts, setStatCounts] = useState([0, 0, 0]);
-  const [statsAnimated, setStatsAnimated] = useState(false);
-  const [isDesktop, setIsDesktop] = useState(false);
-  const bookRef = useRef(DEFAULT_BOOK_SETTINGS);
-  const bookTitle = book.title || DEFAULT_BOOK_SETTINGS.title;
-
-  useEffect(() => {
-    bookRef.current = book;
-  }, [book]);
-
-  useEffect(() => {
-    const updateViewport = () => {
-      setIsDesktop(window.innerWidth >= 1024);
-    };
-
-    updateViewport();
-    window.addEventListener('resize', updateViewport);
-    return () => window.removeEventListener('resize', updateViewport);
-  }, []);
 
   useEffect(() => {
     let active = true;
-
-    const loadBookSettings = async () => {
-      try {
-        const data = await fetch(`${API}/settings`).then((res) => res.json());
-        if (!active) return;
-
-        setBook(normalizeBookSettings(data?.book));
-      } catch {
-        if (active) setBook(DEFAULT_BOOK_SETTINGS);
-      }
-    };
-
-    loadBookSettings();
+    fetch(`${API_BASE_URL}/settings`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (active) setBook(normalizeBookSettings(data?.book));
+      })
+      .catch(() => {});
     return () => {
       active = false;
     };
   }, []);
 
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            if (bookAnimationState === 'closed') {
-              // Book opening animation
-              setTimeout(() => setBookAnimationState('opening'), 100);
-              setTimeout(() => setBookAnimationState('opened'), 2000);
-            }
-            if (!statsAnimated) {
-              setStatsAnimated(true);
-              // Animate progress bar after book opens
-              setTimeout(() => animateProgress(), 2200);
-              // Animate stat counters after book opens
-              setTimeout(() => animateStats(), 2200);
-            }
-          }
-        });
-      },
-      { threshold: 0.3 }
-    );
-
-    if (sectionRef.current) observer.observe(sectionRef.current);
-    return () => observer.disconnect();
-  }, [bookAnimationState, statsAnimated]);
-
-  const animateProgress = () => {
-    const duration = 4000; // slow: 4 seconds
-    const frameRate = 1000 / 60;
-    const totalFrames = Math.round(duration / frameRate);
-    const targetProgress = Number(bookRef.current.progress ?? DEFAULT_BOOK_SETTINGS.progress);
-    let frame = 0;
-    const interval = setInterval(() => {
-      frame++;
-      const progress = easeOutQuart(frame / totalFrames);
-      setProgressWidth(Math.round(progress * targetProgress));
-      if (frame === totalFrames) clearInterval(interval);
-    }, frameRate);
-  };
-
-  const animateStats = () => {
-    const duration = 5000; // slow: 5 seconds
-    const frameRate = 1000 / 60;
-    const totalFrames = Math.round(duration / frameRate);
-    let frame = 0;
-    const interval = setInterval(() => {
-      frame++;
-      const progress = easeOutQuart(frame / totalFrames);
-      setStatCounts(bookRef.current.stats.map((s) => Math.round(progress * (s.target || 0))));
-      if (frame === totalFrames) clearInterval(interval);
-    }, frameRate);
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     setIsSubmitting(true);
     setSubmitError('');
+    setConfirmationMessage('');
 
     try {
-      const response = await fetch(`${API}/waitlist`, {
+      const response = await fetch(`${API_BASE_URL}/waitlist`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Accept: 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
         body: JSON.stringify({ email }),
       });
-
       const data = await response.json().catch(() => ({}));
-      if (!response.ok) {
-        throw new Error(data.message || 'Something went wrong, try again');
-      }
-
-      setConfirmationMessage(
-        data.emailSent
-          ? 'Check your inbox for a confirmation email.'
-          : 'You are on the list, but email delivery is not configured yet.'
-      );
-      setIsSubmitted(true);
+      if (!response.ok) throw new Error(data.message || 'Something went wrong.');
       setEmail('');
-      setTimeout(() => {
-        setIsSubmitted(false);
-        setConfirmationMessage('');
-        toggleWaitlist();
-      }, 3000);
+      setConfirmationMessage(data.message || 'You are on the list.');
     } catch (error) {
-      setSubmitError(error.message || 'Something went wrong, try again');
+      setSubmitError(error.message || 'Something went wrong.');
+    } finally {
+      setIsSubmitting(false);
     }
-    setIsSubmitting(false);
   };
 
-  const handleClose = () => {
-    setIsSubmitted(false);
-    setConfirmationMessage('');
-    toggleWaitlist();
-  };
+  const coverUrl = book.coverUrl || '/images/placeholder-audacity.jpg';
 
   return (
-    <section 
-      ref={sectionRef}
-      className="py-12 sm:py-16 md:py-20 lg:py-24 text-white relative overflow-hidden bg-background-dark"
-      id="book"
-    >
-      {/* Giant Book Icon Background */}
-      <div 
-        className={`absolute inset-0 flex items-center justify-center pointer-events-none transition-all duration-2000 ${
-          bookAnimationState === 'closed' ? 'opacity-100 scale-100' : 
-          bookAnimationState === 'opening' ? 'opacity-60 scale-150 book-opening' :
-          'opacity-0 scale-200'
-        }`}
-      >
-        <BookOpen 
-          className={`text-primary/10 transition-all ${
-            bookAnimationState === 'closed' ? 'w-64 h-64 sm:w-96 sm:h-96' :
-            'w-96 h-96 sm:w-[600px] sm:h-[600px]'
-          }`}
-          strokeWidth={0.5}
-        />
-      </div>
-
-      {/* Background Glow */}
-      <div className="absolute inset-0 opacity-10">
-        <div className="absolute top-0 right-0 w-64 h-64 sm:w-96 sm:h-96 bg-primary/40 blur-[120px]" />
-        <div className="absolute bottom-0 left-0 w-64 h-64 sm:w-96 sm:h-96 bg-primary/20 blur-[120px]" />
-      </div>
-
-      {/* Content - fades in after book opens */}
-      <div 
-        className={`max-w-7xl mx-auto px-4 sm:px-6 relative z-10 transition-all duration-1000 ${
-          isDesktop
-            ? bookAnimationState === 'opened'
-              ? 'opacity-100 translate-y-0'
-              : 'opacity-0 translate-y-10'
-            : 'opacity-100 translate-y-0'
-        }`}
-      >
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 sm:gap-12 md:gap-16 lg:gap-20 items-center">
-          {/* Left Content */}
-          <div>
-            <h2 className="text-accent-magenta font-black tracking-widest text-xs sm:text-sm uppercase mb-4 sm:mb-6">
-              Upcoming Publication
-            </h2>
-            <h3 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-6 sm:mb-8 leading-tight font-serif">
-              {(book.title || DEFAULT_BOOK_SETTINGS.title).split(' ')[0] || 'Success'}{' '}
-              <span className="italic">
-                {(book.title || DEFAULT_BOOK_SETTINGS.title).split(' ').slice(1).join(' ') || 'Leaves Cues'}
-              </span>
-            </h3>
-            <p className="text-slate-400 text-base sm:text-lg mb-8 sm:mb-10 leading-relaxed max-w-lg">
-              {book.teaser || DEFAULT_BOOK_SETTINGS.teaser}
-            </p>
-
-            {/* Progress Bar */}
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-sm font-bold uppercase tracking-wider">
-                  Manuscript Completion
-                </span>
-                <span className="text-primary font-black tabular-nums">
-                  {book.progress ?? DEFAULT_BOOK_SETTINGS.progress}%
-                </span>
-              </div>
-              <div className="w-full h-4 bg-slate-800 rounded-full overflow-hidden relative">
-                {/* Filled bar */}
-                <div
-                  className="h-full bg-primary rounded-full transition-none relative overflow-hidden"
-                  style={{ width: `${progressWidth || book.progress || 0}%` }}
-                >
-                  {/* Moving glow shimmer — always on, indicating ongoing work */}
-                  {progressWidth > 0 && (
-                    <div className="absolute inset-y-0 w-16 bg-white/30 blur-sm animate-shimmer rounded-full" />
-                  )}
-                </div>
-                {/* Soft glow at the tip */}
-                {progressWidth > 0 && (
-                  <div
-                    className="absolute top-1/2 -translate-y-1/2 w-6 h-6 bg-primary/60 rounded-full blur-md transition-none pointer-events-none"
-                    style={{ left: `calc(${progressWidth}% - 12px)` }}
-                  />
-                )}
+    <section className="py-16 sm:py-20 lg:py-28 bg-background-dark text-white" id="book">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        <div className="grid grid-cols-1 lg:grid-cols-[0.9fr_1.1fr] gap-10 lg:gap-16 items-center">
+          <div className="relative mx-auto w-full max-w-sm">
+            <div className="absolute -inset-5 rounded-3xl bg-primary/20 blur-2xl" />
+            <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border border-white/10 bg-slate-900 shadow-2xl">
+              <img src={coverUrl} alt={`${book.title} cover`} className="w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-linear-to-t from-slate-950/80 via-transparent to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-6">
+                <BookOpen className="w-8 h-8 text-primary mb-4" />
+                <h3 className="text-3xl font-black uppercase leading-tight">{book.title}</h3>
+                <p className="mt-2 text-xs font-bold uppercase tracking-[0.25em] text-white/60">By Favour Odedele</p>
               </div>
             </div>
-
-            {/* Stats */}
-            <div className="flex gap-8 mt-12">
-              {(book.stats || DEFAULT_BOOK_SETTINGS.stats).map((stat, i) => (
-                <>
-                  {i > 0 && <div key={`div-${i}`} className="w-px h-12 bg-slate-800" />}
-                  <div key={stat.label}>
-                    <div className="text-3xl font-black text-white mb-1 tabular-nums">
-                      {String(statCounts[i] ?? 0).padStart(2, '0')}
-                    </div>
-                    <div className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">
-                      {stat.label}
-                    </div>
-                  </div>
-                </>
-              ))}
-            </div>
-
-            {/* Waitlist CTA */}
-            <button
-              onClick={toggleWaitlist}
-              className="mt-10 bg-accent-magenta hover:bg-accent-magenta/90 text-white px-8 py-4 rounded-xl font-bold transition-all shadow-lg shadow-accent-magenta/20 active:scale-95"
-            >
-              Join Waitlist
-            </button>
           </div>
 
-          {/* Right: Book Mockup */}
-          <div className="relative group">
-            <div className="absolute -inset-4 bg-primary/20 blur-2xl group-hover:bg-primary/30 transition-all rounded-3xl" />
-            <div className="aspect-square bg-slate-900 rounded-2xl border border-slate-800/30 flex items-center justify-center p-12 relative overflow-hidden">
-              <div className="absolute top-0 right-0 p-8">
-                <BookOpen className="w-16 h-16 text-primary/20" />
-              </div>
-              <div className="text-center relative z-10">
-                <div className="w-16 h-1 bg-primary mx-auto mb-8" />
-                <h4 className="text-3xl font-black mb-4 tracking-tighter uppercase">
-                  {(book.title || DEFAULT_BOOK_SETTINGS.title).split(' ')[0] || 'Success'} <br />
-                  {(book.title || DEFAULT_BOOK_SETTINGS.title).split(' ').slice(1).join(' ') || 'Leaves Cues'}
-                </h4>
-                <p className="text-slate-500 text-sm font-bold tracking-widest uppercase">
-                  By Favor Odedele
-                </p>
-              </div>
-              {/* Geometric accent */}
-              <div className="absolute -bottom-20 -right-20 w-64 h-64 bg-accent-magenta/5 rounded-full border border-white/5" />
+          <div>
+            <p className="text-accent-magenta font-black tracking-[0.35em] uppercase text-xs mb-5">My Book</p>
+            <h2 className="text-4xl sm:text-5xl lg:text-7xl font-black tracking-tight leading-none">
+              {book.title || 'Becoming the 1%'}
+            </h2>
+            <p className="mt-8 text-base sm:text-lg leading-relaxed text-slate-300 max-w-2xl">
+              {book.teaser || DEFAULT_BOOK_SETTINGS.teaser}
+            </p>
+            <div className="mt-8 flex flex-col sm:flex-row gap-3">
+              <a
+                href={book.pdfUrl || '#'}
+                target={book.pdfUrl ? '_blank' : undefined}
+                rel={book.pdfUrl ? 'noreferrer' : undefined}
+                aria-disabled={!book.pdfUrl}
+                className={`inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-black uppercase tracking-widest transition ${
+                  book.pdfUrl
+                    ? 'bg-white text-slate-950 hover:bg-primary hover:text-white'
+                    : 'bg-white/10 text-white/40 pointer-events-none'
+                }`}
+              >
+                <Download className="w-4 h-4" /> Download PDF
+              </a>
+              <button
+                type="button"
+                onClick={toggleWaitlist}
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-accent-magenta px-6 py-3 text-sm font-black uppercase tracking-widest text-white hover:bg-accent-magenta/90"
+              >
+                <Mail className="w-4 h-4" /> Join the waitlist
+              </button>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Waitlist Modal */}
-      <Modal
-        isOpen={isWaitlistOpen}
-        onClose={handleClose}
-        title="Join the Waitlist"
-      >
-        {isSubmitted ? (
-          <div className="text-center py-8">
-            <div className="w-16 h-16 bg-accent-green/10 rounded-full flex items-center justify-center mx-auto mb-4">
-              <svg className="w-8 h-8 text-accent-green" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-              </svg>
-            </div>
-            <h4 className="text-xl font-bold text-slate-900 mb-2">You're on the list!</h4>
-            <p className="text-slate-600">
-              We'll notify you when <strong>"{bookTitle}"</strong> is ready for pre-order.
-            </p>
-            {confirmationMessage && (
-              <p className="mt-3 text-sm font-medium text-emerald-700">
-                {confirmationMessage}
-              </p>
-            )}
-          </div>
-        ) : (
-          <div className="space-y-6">
-            <p className="text-slate-600 leading-relaxed">
-              Be the first to know when <strong>"{bookTitle}"</strong> is
-              available. Get exclusive early access and launch day discounts.
-            </p>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email address"
-                required
-                className="w-full px-4 py-3 rounded-xl border border-slate-200 text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-              />
-              {submitError && (
-                <p className="text-sm text-red-600 font-medium">
-                  {submitError}
-                </p>
-              )}
-              <button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full bg-primary hover:bg-primary-dark disabled:opacity-60 disabled:cursor-not-allowed text-white py-3 rounded-xl font-bold transition-all"
-              >
-                {isSubmitting ? 'Submitting...' : 'Notify Me'}
-              </button>
-            </form>
-          </div>
-        )}
+      <Modal isOpen={isWaitlistOpen} onClose={toggleWaitlist} title="Get book updates">
+        <div className="space-y-6">
+          <p className="text-slate-600 leading-relaxed">
+            Be first to know when <strong>{book.title}</strong> is available and receive early updates from Favour.
+          </p>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <input
+              type="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              placeholder="Enter your email address"
+              required
+              className="w-full px-4 py-3 rounded-xl border border-slate-200 text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            />
+            {submitError && <p className="text-sm text-red-600 font-medium">{submitError}</p>}
+            {confirmationMessage && <p className="text-sm text-emerald-700 font-medium">{confirmationMessage}</p>}
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full bg-primary hover:bg-primary-dark disabled:opacity-60 disabled:cursor-not-allowed text-white py-3 rounded-xl font-bold transition-all"
+            >
+              {isSubmitting ? 'Submitting...' : 'Notify Me'}
+            </button>
+          </form>
+        </div>
       </Modal>
     </section>
   );
 }
+

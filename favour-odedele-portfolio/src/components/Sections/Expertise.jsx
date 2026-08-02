@@ -1,105 +1,60 @@
-import { Settings, Handshake, GraduationCap, BarChart3 } from 'lucide-react';
-import { useEffect, useState } from 'react';
-import { API_BASE_URL } from '../../config.js';
+import { BookOpen, GraduationCap, Lightbulb, Users } from 'lucide-react';
 
-const API = API_BASE_URL;
-
-const iconMap = { Settings, Handshake, GraduationCap, BarChart3 };
-
-const fallbackPillars = [
+const focusAreas = [
   {
-    icon: 'Settings',
-    title: 'Operational Excellence',
-    description: 'Optimizing internal workflows and managing resources to ensure peak performance across global teams.',
-    hoverColor: 'group-hover:bg-primary group-hover:text-white',
-    iconBg: 'text-primary',
-    borderHover: 'hover:border-primary',
+    icon: GraduationCap,
+    title: 'Education and growth',
+    description: 'I care about learning as a personal discipline and as a tool for helping people see wider possibilities for their lives.',
   },
   {
-    icon: 'Handshake',
-    title: 'Strategic Partnerships',
-    description: 'Cultivating high-value alliances with stakeholders, NGOs, and corporate entities to scale program reach.',
-    hoverColor: 'group-hover:bg-accent-magenta group-hover:text-white',
-    iconBg: 'bg-accent-magenta/10 text-accent-magenta',
-    borderHover: 'hover:border-accent-magenta',
+    icon: Lightbulb,
+    title: 'Ideas in public',
+    description: 'I write, reflect, and build around leadership, entrepreneurship, identity, discipline, and becoming a more intentional person.',
   },
   {
-    icon: 'GraduationCap',
-    title: 'Educational Innovation',
-    description: 'Designing cutting-edge curriculum and hybrid learning frameworks for the modern digital era.',
-    hoverColor: 'group-hover:bg-accent-green group-hover:text-white',
-    iconBg: 'bg-accent-green/10 text-accent-green',
-    borderHover: 'hover:border-accent-green',
-  },
-  {
-    icon: 'BarChart3',
-    title: 'Scalable Impact',
-    description: 'Developing data-driven models to replicate success across multiple geographic and socio-economic contexts.',
-    hoverColor: 'group-hover:bg-primary group-hover:text-white',
-    iconBg: 'text-primary',
-    borderHover: 'hover:border-primary',
+    icon: Users,
+    title: 'Community building',
+    description: 'I am interested in rooms, circles, and initiatives that help people find clarity, accountability, and courage to move forward.',
   },
 ];
 
-export default function Expertise() {
-  const [pillars, setPillars] = useState(fallbackPillars);
-
-  useEffect(() => {
-    let active = true;
-
-    fetch(`${API}/expertise`)
-      .then((res) => res.json())
-      .then((data) => {
-        if (!active) return;
-
-        if (Array.isArray(data) && data.length >= 4) {
-          setPillars(data);
-        }
-      })
-      .catch(() => {});
-
-    return () => {
-      active = false;
-    };
-  }, []);
-
+export default function AboutMe() {
   return (
-    <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-white" id="expertise">
+    <section className="py-16 sm:py-20 lg:py-28 bg-white" id="about">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 sm:mb-12 md:mb-16 gap-4 sm:gap-6">
-          <div className="max-w-2xl">
-            <h2 className="text-accent-magenta font-bold tracking-widest uppercase text-xs sm:text-sm mb-3 sm:mb-4">
-              Core Competencies
+        <div className="grid grid-cols-1 lg:grid-cols-[0.9fr_1.1fr] gap-10 lg:gap-16 items-start">
+          <div>
+            <p className="text-accent-magenta font-bold tracking-widest uppercase text-xs sm:text-sm mb-4">
+              About Me
+            </p>
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-tight text-slate-950">
+              I am building a life around ideas, people, and personal becoming.
             </h2>
-            <h3 className="text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight">
-              Strategic Pillars of Excellence
-            </h3>
           </div>
-          <p className="text-slate-500 text-sm sm:text-base md:text-lg">
-            My methodology integrates operational rigor with human-centric design.
-          </p>
-        </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-          {pillars.map((pillar) => {
-            const Icon = iconMap[pillar.icon] || Settings;
-            return (
-              <div
-                key={pillar.title}
-                className={`group p-8 rounded-xl border border-slate-200 transition-all cursor-pointer bg-background-muted ${pillar.borderHover || 'hover:border-primary'}`}
-              >
-                <div
-                  className={`w-14 h-14 rounded-lg flex items-center justify-center mb-6 transition-all ${pillar.iconBg} ${pillar.hoverColor}`}
-                >
-                  <Icon className="w-7 h-7" />
+          <div className="space-y-6 text-slate-600 text-base sm:text-lg leading-relaxed">
+            <p>
+              My work sits at the intersection of education, leadership, writing, and community. I am drawn to the question of how people grow: what shapes discipline, what gives people courage, and what kind of environments help them become more than they once imagined.
+            </p>
+            <p>
+              This site is a home for my personal reflections, independent initiatives, book updates, community experiments, and the work I am gradually building as a future social entrepreneur.
+            </p>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-4">
+              {focusAreas.map((item) => (
+                <div key={item.title} className="border border-slate-200 bg-background-muted p-5 rounded-xl">
+                  <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center mb-4">
+                    <item.icon className="w-5 h-5" />
+                  </div>
+                  <h3 className="font-black text-slate-950 mb-2">{item.title}</h3>
+                  <p className="text-sm leading-relaxed text-slate-500">{item.description}</p>
                 </div>
-                <h4 className="text-xl font-bold mb-3">{pillar.title}</h4>
-                <p className="text-slate-500 text-sm leading-relaxed">
-                  {pillar.description}
-                </p>
-              </div>
-            );
-          })}
+              ))}
+            </div>
+            <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700">
+              <BookOpen className="w-4 h-4 text-accent-magenta" />
+              Author of Becoming the 1%
+            </div>
+          </div>
         </div>
       </div>
     </section>

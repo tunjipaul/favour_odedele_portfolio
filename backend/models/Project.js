@@ -5,6 +5,7 @@ const projectSchema = new mongoose.Schema(
     title: { type: String, required: true },
     tag: { type: String, required: true },
     tagColor: { type: String, default: 'primary' },
+    category: { type: String, enum: ['highlight', 'book', 'media'], default: 'highlight' },
     role: { type: String, required: true },
     region: { type: String, required: true },
     image: { type: String, default: '' },      // Cloudinary URL
@@ -20,3 +21,4 @@ const projectSchema = new mongoose.Schema(
 
 const Project = mongoose.model('Project', projectSchema);
 export default Project;
+

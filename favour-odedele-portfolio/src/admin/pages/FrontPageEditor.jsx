@@ -1,14 +1,12 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ImagePlus, Info, Save, Undo2, Upload } from 'lucide-react';
 import { api } from '../utils/api';
-import { API_BASE_URL } from '../../config.js';
 
 const EMPTY_SETTINGS = {
   hero: {
     fullName: '',
     bioText: '',
     portrait: '',
-    cvUrl: '',
   },
 };
 
@@ -30,7 +28,6 @@ export default function FrontPageEditor() {
   const [msg, setMsg] = useState('');
   const [isError, setIsError] = useState(false);
   const [uploadingPortrait, setUploadingPortrait] = useState(false);
-  const [pendingCvUrl, setPendingCvUrl] = useState('');
 
   const flash = (text, error = false) => {
     setMsg(text);
@@ -62,14 +59,6 @@ export default function FrontPageEditor() {
     };
   }, []);
 
-  useEffect(() => {
-    return () => {
-      if (pendingCvUrl.startsWith('blob:')) {
-        URL.revokeObjectURL(pendingCvUrl);
-      }
-    };
-  }, [pendingCvUrl]);
-
   const updateHero = (key, value) => {
     setSettings((prev) => ({
       ...prev,
@@ -85,10 +74,6 @@ export default function FrontPageEditor() {
     [savedSnapshot, settings]
   );
 
-  const handleDiscard = () => {
-    setSettings(savedSnapshot);
-  };
-
   const handleSave = async () => {
     setSaving(true);
     try {
@@ -96,7 +81,6 @@ export default function FrontPageEditor() {
       const shaped = safeSettingsShape(updated);
       setSettings(shaped);
       setSavedSnapshot(shaped);
-      setPendingCvUrl('');
       flash('Front page updated successfully.');
     } catch (err) {
       flash(err.message || 'Could not save front page settings', true);
@@ -124,78 +108,6 @@ export default function FrontPageEditor() {
     }
   };
 
-  const handleCVUpload = async (event) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    if (file.type !== 'application/pdf') {
-      flash('Please upload a PDF file for your CV.', true);
-      event.target.value = '';
-      return;
-    }
-
-    setSaving(true);
-    try {
-      const previewUrl = URL.createObjectURL(file);
-      setPendingCvUrl((prev) => {
-        if (prev.startsWith('blob:')) {
-          URL.revokeObjectURL(prev);
-        }
-        return previewUrl;
-      });
-
-      const formData = new FormData();
-      formData.append('image', file); // API expects field name 'image'
-      const data = await api.upload('/admin/upload', formData);
-      const nextSettings = {
-        ...settings,
-        hero: {
-          ...settings.hero,
-          cvUrl: data.url || '',
-        },
-      };
-      const updated = await api.put('/admin/settings', nextSettings);
-      const shaped = safeSettingsShape(updated);
-      setSettings(shaped);
-      setSavedSnapshot(shaped);
-      flash('CV uploaded and published successfully.');
-    } catch (err) {
-      flash(err.message || 'CV upload failed', true);
-    } finally {
-      setSaving(false);
-      event.target.value = '';
-    }
-  };
-
-  const handleClearCV = async () => {
-    setSaving(true);
-    try {
-      const nextSettings = {
-        ...settings,
-        hero: {
-          ...settings.hero,
-          cvUrl: '',
-        },
-      };
-      const updated = await api.put('/admin/settings', nextSettings);
-      const shaped = safeSettingsShape(updated);
-      setSettings(shaped);
-      setSavedSnapshot(shaped);
-      setPendingCvUrl('');
-      flash('CV removed successfully.');
-    } catch (err) {
-      flash(err.message || 'Could not remove CV', true);
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const cvPreviewUrl = pendingCvUrl
-    || (settings.hero.cvUrl
-      ? `${API_BASE_URL}/cv?v=${encodeURIComponent(settings.hero.cvUrl)}`
-      : '');
-  const cvDownloadUrl = `${API_BASE_URL}/cv?download=1`;
-
   if (loading) {
     return <div className="p-8 text-slate-300">Loading front page editor...</div>;
   }
@@ -210,14 +122,14 @@ export default function FrontPageEditor() {
               <div>
                 <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">Edit Hero Section</h1>
                 <p className="mt-1 text-xs sm:text-sm text-slate-400 max-w-2xl">
-                  Configure the visual identity and messaging for the top section of the landing page.
+                  Configure the personal-brand message and portrait used at the top of the site.
                 </p>
               </div>
 
               <div className="flex w-full md:w-auto gap-2 sm:gap-3">
                 <button
                   type="button"
-                  onClick={handleDiscard}
+                  onClick={() => setSettings(savedSnapshot)}
                   disabled={!hasChanges || saving}
                   className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 px-4 sm:px-5 h-9 sm:h-10 rounded-xl border border-white/20 text-slate-100 text-xs sm:text-sm font-semibold hover:bg-white/5 disabled:opacity-50"
                 >
@@ -231,21 +143,14 @@ export default function FrontPageEditor() {
                   className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 px-4 sm:px-5 h-9 sm:h-10 rounded-xl bg-orange-500 text-white text-xs sm:text-sm font-bold hover:bg-orange-400 disabled:opacity-50"
                 >
                   <Save className="w-4 h-4" />
-                  {saving ? <span>Saving...</span> : <span className="hidden sm:inline">Publish Changes</span>}
-                  {saving ? <span className="sm:hidden">Saving...</span> : <span className="sm:hidden">Publish</span>}
+                  {saving ? 'Saving...' : 'Publish'}
                 </button>
               </div>
             </div>
           </div>
 
           {msg && (
-            <div
-              className={`mx-4 sm:mx-6 mt-4 rounded-xl border px-4 py-3 text-xs sm:text-sm ${
-                isError
-                  ? 'border-red-400/40 bg-red-500/10 text-red-200'
-                  : 'border-emerald-400/40 bg-emerald-500/10 text-emerald-200'
-              }`}
-            >
+            <div className={`mx-4 sm:mx-6 mt-4 rounded-xl border px-4 py-3 text-xs sm:text-sm ${isError ? 'border-red-400/40 bg-red-500/10 text-red-200' : 'border-emerald-400/40 bg-emerald-500/10 text-emerald-200'}`}>
               {msg}
             </div>
           )}
@@ -260,20 +165,20 @@ export default function FrontPageEditor() {
                   <span className="mb-2 block text-xs sm:text-sm font-semibold text-slate-200">Main Headline</span>
                   <input
                     value={settings.hero.fullName}
-                    onChange={(e) => updateHero('fullName', e.target.value)}
+                    onChange={(event) => updateHero('fullName', event.target.value)}
                     className="w-full h-10 sm:h-11 rounded-xl border border-white/15 bg-slate-900 px-3 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-orange-400/60"
-                    placeholder="Enter headline..."
+                    placeholder="FAVOUR ODEDELE"
                   />
                 </label>
 
                 <label className="block">
-                  <span className="mb-2 block text-xs sm:text-sm font-semibold text-slate-200">Sub-headline</span>
+                  <span className="mb-2 block text-xs sm:text-sm font-semibold text-slate-200">Personal Introduction</span>
                   <textarea
                     value={settings.hero.bioText}
-                    onChange={(e) => updateHero('bioText', e.target.value)}
+                    onChange={(event) => updateHero('bioText', event.target.value)}
                     rows={3}
                     className="w-full rounded-xl border border-white/15 bg-slate-900 px-3 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-orange-400/60"
-                    placeholder="Enter sub-headline..."
+                    placeholder="Author, community builder, and future social entrepreneur..."
                   />
                 </label>
               </div>
@@ -281,19 +186,14 @@ export default function FrontPageEditor() {
 
             <section className="rounded-2xl border border-white/10 bg-slate-950/50 overflow-hidden">
               <div className="px-4 sm:px-5 py-3 sm:py-4 border-b border-white/10 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <h2 className="text-base sm:text-lg font-bold text-white">Hero Media Assets</h2>
+                <h2 className="text-base sm:text-lg font-bold text-white">Hero Portrait</h2>
                 <span className="text-[10px] sm:text-xs text-slate-400">Aspect ratio 4:5 recommended</span>
               </div>
               <div className="p-5 grid grid-cols-1 lg:grid-cols-3 gap-6">
                 <div className="lg:col-span-1">
-                  <p className="text-sm font-semibold text-slate-200 mb-3">Main Hero Portrait</p>
                   <div className="aspect-[4/5] rounded-2xl border-2 border-dashed border-white/20 bg-slate-900 overflow-hidden">
                     {settings.hero.portrait ? (
-                      <img
-                        src={settings.hero.portrait}
-                        alt="Hero portrait preview"
-                        className="w-full h-full object-cover"
-                      />
+                      <img src={settings.hero.portrait} alt="Hero portrait preview" className="w-full h-full object-cover" />
                     ) : (
                       <div className="h-full w-full grid place-items-center text-slate-500">
                         <div className="text-center">
@@ -306,116 +206,23 @@ export default function FrontPageEditor() {
                 </div>
 
                 <div className="lg:col-span-2 space-y-4">
-                  <label className="block">
-                    <span className="mb-2 block text-sm font-semibold text-slate-200">Hero Portrait</span>
-                    <label className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-white/20 text-sm font-semibold text-slate-200 hover:bg-white/5 cursor-pointer">
-                      <Upload className="w-4 h-4" />
-                      {uploadingPortrait ? 'Uploading...' : 'Choose Portrait'}
-                      <input
-                        type="file"
-                        accept="image/png,image/jpeg,image/jpg,image/webp"
-                        onChange={handlePortraitUpload}
-                        className="hidden"
-                        disabled={uploadingPortrait}
-                      />
-                    </label>
+                  <label className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-white/20 text-sm font-semibold text-slate-200 hover:bg-white/5 cursor-pointer">
+                    <Upload className="w-4 h-4" />
+                    {uploadingPortrait ? 'Uploading...' : 'Choose Portrait'}
+                    <input
+                      type="file"
+                      accept="image/png,image/jpeg,image/jpg,image/webp"
+                      onChange={handlePortraitUpload}
+                      className="hidden"
+                      disabled={uploadingPortrait}
+                    />
                   </label>
 
                   <div className="rounded-xl border border-blue-400/20 bg-blue-500/10 p-4 flex items-start gap-3">
                     <Info className="w-4 h-4 mt-0.5 text-blue-300 shrink-0" />
                     <p className="text-xs leading-relaxed text-blue-100">
-                      This editor maps to existing hero settings used by the site: name, bio text, and portrait image.
+                      This page edits the hero headline, introduction, and portrait. Extra document assets are intentionally not part of the public site.
                     </p>
-                  </div>
-
-                  <div className="pt-4 border-t border-white/10">
-                    <p className="text-sm font-semibold text-slate-200 mb-3">Professional CV (PDF)</p>
-                    <div className="flex items-center gap-4">
-                      <label className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg bg-white/10 border border-white/20 text-sm font-semibold text-slate-200 hover:bg-white/20 cursor-pointer transition-colors">
-                        <Upload className="w-4 h-4" />
-                        Upload New CV
-                        <input
-                          type="file"
-                          accept=".pdf"
-                          onChange={handleCVUpload}
-                          className="hidden"
-                        />
-                      </label>
-                      {settings.hero.cvUrl && (
-                        <a 
-                          href={cvPreviewUrl || cvDownloadUrl} 
-                          target="_blank" 
-                          rel="noreferrer"
-                          className="text-xs text-orange-400 hover:text-orange-300 font-medium underline underline-offset-4"
-                        >
-                          View Current CV
-                        </a>
-                      )}
-                      {settings.hero.cvUrl && (
-                        <button
-                          type="button"
-                          onClick={handleClearCV}
-                          disabled={saving}
-                          className="text-xs text-red-300 hover:text-red-200 font-medium underline underline-offset-4 disabled:opacity-50"
-                        >
-                          Remove CV
-                        </button>
-                      )}
-                    </div>
-                    <div className="mt-4 overflow-hidden rounded-2xl border border-white/10 bg-slate-950/80">
-                      {cvPreviewUrl ? (
-                        <iframe
-                          key={cvPreviewUrl}
-                          src={cvPreviewUrl}
-                          title="Current CV preview"
-                          className="h-[320px] w-full bg-white"
-                        />
-                      ) : (
-                        <div className="grid h-[320px] place-items-center px-6 text-center bg-gradient-to-br from-slate-950 to-slate-900">
-                          <div className="max-w-sm rounded-2xl border border-white/10 bg-white/5 px-6 py-7 shadow-lg">
-                            <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full border border-orange-400/30 bg-orange-500/10 text-orange-300">
-                              <Upload className="h-5 w-5" />
-                            </div>
-                            <p className="text-sm font-semibold text-slate-100">No CV available</p>
-                            <p className="mt-2 text-xs leading-relaxed text-slate-400">
-                              Upload a PDF CV to preview it here and publish the public download link.
-                            </p>
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </section>
-
-            <section className="rounded-2xl border border-white/10 bg-slate-950/40 overflow-hidden">
-              <div className="px-5 py-4 border-b border-white/10">
-                <h2 className="text-lg font-bold text-white">Live Preview (Desktop)</h2>
-              </div>
-              <div className="p-5 bg-slate-950">
-                <div className="rounded-xl overflow-hidden border border-white/10 min-h-[240px] flex">
-                  <div className="w-[55%] p-6 bg-slate-900 flex flex-col justify-center">
-                    <p className="text-[10px] uppercase tracking-[0.2em] text-orange-300 font-bold mb-3">Front Page</p>
-                    <h3 className="text-2xl font-black leading-tight text-white">
-                      {settings.hero.fullName || 'Main Headline'}
-                    </h3>
-                    <p className="text-sm text-slate-300 mt-3 line-clamp-4">
-                      {settings.hero.bioText || 'Sub-headline preview'}
-                    </p>
-                  </div>
-                  <div className="w-[45%] bg-slate-800">
-                    {settings.hero.portrait ? (
-                      <img
-                        src={settings.hero.portrait}
-                        alt="Hero preview"
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full grid place-items-center text-slate-500">
-                        <span className="text-xs font-semibold uppercase tracking-wide">Portrait Preview</span>
-                      </div>
-                    )}
                   </div>
                 </div>
               </div>
@@ -426,3 +233,6 @@ export default function FrontPageEditor() {
     </div>
   );
 }
+
+
+

@@ -206,7 +206,7 @@ export default function GalleryManager() {
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search Gallery of Impact..."
+              placeholder="Search Gallery..."
               className="w-full h-10 rounded-xl border border-white/10 bg-slate-950/60 pl-10 pr-3 text-xs sm:text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
             />
           </label>
@@ -226,7 +226,7 @@ export default function GalleryManager() {
         </div>
 
         <div className="px-4 sm:px-5 md:px-6 pt-4 sm:pt-5">
-          <h2 className="text-xl sm:text-2xl font-bold text-white">Gallery of Impact</h2>
+          <h2 className="text-xl sm:text-2xl font-bold text-white">Gallery</h2>
           <p className="text-xs sm:text-sm text-slate-400 mt-1">Manage photos from Speaking, Cohorts, and Panels.</p>
         </div>
 
@@ -507,3 +507,4 @@ export default function GalleryManager() {
     </div>
   );
 }
+

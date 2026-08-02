@@ -6,8 +6,8 @@ import { api } from '../utils/api';
 
 const quickActions = [
   {
-    title: 'New Case Study',
-    description: 'Publish a new leadership project',
+    title: 'New Highlight',
+    description: 'Publish a personal milestone',
     Icon: Plus,
     accent: 'bg-emerald-500 text-white',
     iconBg: 'bg-emerald-600/80',
@@ -15,15 +15,15 @@ const quickActions = [
   },
   {
     title: 'Upload Gallery Media',
-    description: 'Add photos or videos to Gallery of Impact',
+    description: 'Add photos to the public gallery',
     Icon: CloudUpload,
     accent: 'bg-lime-500 text-slate-950',
     iconBg: 'bg-lime-500/80',
     to: '/admin/gallery',
   },
   {
-    title: 'Manage Waitlist',
-    description: 'View and export all signups',
+    title: 'Manage Community',
+    description: 'View community subscribers',
     Icon: ListChecks,
     accent: 'bg-slate-800 text-slate-100',
     iconBg: 'bg-slate-800/70',
@@ -33,25 +33,25 @@ const quickActions = [
 
 const fallbackProjects = [
   {
-    title: 'Fintech Leadership Strategy 2024',
+    title: 'Becoming the 1%',
     status: 'Published',
     statusTone: 'bg-emerald-600/20 text-emerald-200',
     lastModified: '2 hours ago',
-    author: 'Favor Odedele',
+    author: 'Favour Odedele',
   },
   {
-    title: 'Product Innovation Workshop',
+    title: 'Civic Leadership',
     status: 'In Review',
     statusTone: 'bg-amber-600/20 text-amber-200',
     lastModified: 'Yesterday, 4:45 PM',
     author: 'John D.',
   },
   {
-    title: 'Enterprise Scalability Report',
+    title: 'Community Experiments',
     status: 'Draft',
     statusTone: 'bg-slate-800/30 text-slate-400',
     lastModified: '3 days ago',
-    author: 'Favor Odedele',
+    author: 'Favour Odedele',
   },
 ];
 
@@ -65,22 +65,13 @@ const formatDateTime = (value) => {
   });
 };
 
-const getInitials = (value) => {
-  if (!value) return 'FO';
-  return value
-    .split(' ')
-    .map((part) => part[0])
-    .join('')
-    .slice(0, 2)
-    .toUpperCase();
-};
 
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
       <div className="bg-slate-900 border border-white/10 p-3 rounded-lg shadow-xl">
         <p className="text-[10px] uppercase tracking-widest text-slate-400 mb-1">{label}</p>
-        <p className="text-sm font-bold text-emerald-400">{payload[0].value} New Signups</p>
+        <p className="text-sm font-bold text-emerald-400">{payload[0].value} New Subscribers</p>
       </div>
     );
   }
@@ -100,10 +91,10 @@ export default function Dashboard() {
           api.get('/admin/gallery'),
           api.get('/admin/waitlist'),
         ]);
-        setProjects(projectData || []);
+        setProjects((projectData || []).filter((item) => (item.category || 'highlight') === 'highlight'));
         setWaitlist(waitlistData || []);
         setCounts({
-          projects: projectData?.length ?? 0,
+          projects: projectData?.filter((item) => (item.category || 'highlight') === 'highlight').length ?? 0,
           gallery: galleryData?.length ?? 0,
           waitlist: waitlistData?.length ?? 0,
         });
@@ -157,9 +148,9 @@ export default function Dashboard() {
   };
 
   const statsCards = [
-    { label: 'Total Signups', value: counts.waitlist, Icon: Users, tone: 'text-emerald-400 bg-emerald-600/10' },
-    { label: 'Active Projects', value: counts.projects, Icon: FolderOpen, tone: 'text-slate-100 bg-slate-800/40' },
-    { label: 'Gallery of Impact', value: counts.gallery, Icon: ImageIcon, tone: 'text-slate-100 bg-slate-800/40' },
+    { label: 'Community Subscribers', value: counts.waitlist, Icon: Users, tone: 'text-emerald-400 bg-emerald-600/10' },
+    { label: 'Published Highlights', value: counts.projects, Icon: FolderOpen, tone: 'text-slate-100 bg-slate-800/40' },
+    { label: 'Gallery Items', value: counts.gallery, Icon: ImageIcon, tone: 'text-slate-100 bg-slate-800/40' },
   ];
 
   return (
@@ -167,11 +158,11 @@ export default function Dashboard() {
       <div className="max-w-[1400px] mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-6 sm:py-8 space-y-6">
         <header className="flex flex-col-reverse gap-4 sm:gap-6 border-b border-white/5 pb-6 sm:pb-8">
           <div>
-            <p className="text-[10px] sm:text-[11px] uppercase tracking-[0.3em] sm:tracking-[0.4em] text-emerald-400 mb-2">Executive Overview</p>
+            <p className="text-[10px] sm:text-[11px] uppercase tracking-[0.3em] sm:tracking-[0.4em] text-emerald-400 mb-2">Brand Overview</p>
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-black leading-tight">
-              Welcome back, <span className="text-white">Favor Odedele.</span>
+              Welcome back, <span className="text-white">Favour Odedele.</span>
             </h1>
-            <p className="text-slate-400 text-xs sm:text-sm mt-2">Managing your leadership portfolio.</p>
+            <p className="text-slate-400 text-xs sm:text-sm mt-2">Managing your personal brand platform.</p>
           </div>
           <div className="flex items-center gap-3 sm:gap-4 self-end sm:self-auto">
             {/* Notification and Profile removed per user request */}
@@ -198,8 +189,8 @@ export default function Dashboard() {
           <div className="xl:col-span-2 bg-slate-900/80 border border-white/10 rounded-2xl p-6 shadow-inner shadow-black/40">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
               <div>
-                <p className="text-sm text-slate-400 uppercase tracking-[0.4em]">Waitlist Growth</p>
-                <p className="text-xs text-slate-500">Daily signups over the last 30 days</p>
+                <p className="text-sm text-slate-400 uppercase tracking-[0.4em]">Community Growth</p>
+                <p className="text-xs text-slate-500">Daily subscribers over the last 30 days</p>
               </div>
               <span className="self-start px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-semibold">{calculateGrowth()} this month</span>
             </div>
@@ -257,8 +248,8 @@ export default function Dashboard() {
           <div className="bg-slate-900/80 border border-white/10 rounded-2xl overflow-hidden">
             <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-white/5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Case Studies</p>
-                <h2 className="text-base sm:text-lg font-bold">Editorial Activity</h2>
+                <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Highlights</p>
+                <h2 className="text-base sm:text-lg font-bold">Homepage Highlights</h2>
               </div>
               <Link to="/admin/projects" className="text-emerald-300 text-xs font-semibold hover:text-emerald-200">
                 View All
@@ -296,8 +287,8 @@ export default function Dashboard() {
           <div className="bg-slate-900/80 border border-white/10 rounded-2xl overflow-hidden">
             <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-white/5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Book Waitlist</p>
-                <h2 className="text-base sm:text-lg font-bold">Recent Signups</h2>
+                <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Community</p>
+                <h2 className="text-base sm:text-lg font-bold">Recent Subscribers</h2>
               </div>
               <Link to="/admin/waitlist" className="text-emerald-300 text-xs font-semibold hover:text-emerald-200">
                 View All
@@ -323,7 +314,7 @@ export default function Dashboard() {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="2" className="px-4 py-8 text-center text-slate-500">No signups yet</td>
+                      <td colSpan="2" className="px-4 py-8 text-center text-slate-500">No subscribers yet</td>
                     </tr>
                   )}
                 </tbody>
@@ -335,3 +326,6 @@ export default function Dashboard() {
     </div>
   );
 }
+
+
+

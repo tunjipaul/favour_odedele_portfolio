@@ -5,7 +5,7 @@ import Project from '../models/Project.js';
 // GET /api/projects — Returns only visible projects, sorted by order
 export const getProjects = async (req, res) => {
   try {
-    const projects = await Project.find({ isVisible: true }).sort({ order: 1 });
+    const projects = await Project.find({ isVisible: true, category: 'highlight' }).sort({ order: 1 });
     res.json(projects);
   } catch (error) {
     console.error('ProjectController.getProjects error:', error);
@@ -18,7 +18,7 @@ export const getProjects = async (req, res) => {
 // GET /api/admin/projects — Returns ALL projects (including hidden)
 export const getAllProjects = async (req, res) => {
   try {
-    const projects = await Project.find().sort({ order: 1 });
+    const projects = await Project.find().sort({ category: 1, order: 1 });
     res.json(projects);
   } catch (error) {
     console.error('ProjectController.getAllProjects error:', error);
@@ -64,3 +64,4 @@ export const deleteProject = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
+
