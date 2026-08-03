@@ -25,7 +25,7 @@ export default function Gallery() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         {/* Header */}
         <div className="text-center mb-8 sm:mb-12 md:mb-16">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black mb-3 sm:mb-4">Gallery</h2>
+          <h2 className="text-2xl sm:text-3xl font-bold mb-3 sm:mb-4">Gallery</h2>
           <p className="text-slate-500 text-sm sm:text-base">
             Snapshots from various panels, training cohorts, and field operations.
           </p>
@@ -55,5 +55,6 @@ export default function Gallery() {
     </section>
   );
 }
+
 
 

@@ -1,3 +1,4 @@
+@import "./styles/fonts.css";
 @import "tailwindcss";
 
 @theme {
@@ -9,8 +10,11 @@
   --color-accent-green: #22c55e;
   --color-accent-magenta: #d946ef;
 
-  --font-display: "Public Sans", sans-serif;
-  --font-serif: "Playfair Display", serif;
+  --font-sans: "FavourBody", system-ui, sans-serif;
+  --font-body: "FavourBody", system-ui, sans-serif;
+  --font-display: "FavourDisplay", "FavourBody", system-ui, sans-serif;
+  --font-serif: "FavourDisplay", "FavourBody", system-ui, sans-serif;
+  --font-name: "FavourName", "FavourDisplay", "FavourBody", system-ui, sans-serif;
 
   --radius-DEFAULT: 0.25rem;
   --radius-lg: 0.5rem;
@@ -22,11 +26,33 @@
 
 /* Base styles */
 body {
-  font-family: var(--font-display);
+  font-family: var(--font-body);
   background-color: var(--color-background-light);
   color: #0f172a;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+h1,
+h2,
+h3,
+h4,
+.font-display,
+.font-serif {
+  font-family: var(--font-display);
+}
+
+p,
+li,
+input,
+textarea,
+button,
+a,
+.font-body {
+  font-family: var(--font-body);
+}
+
+.font-name {
+  font-family: var(--font-name);
 }
 
 /* Geometric dot background pattern */
@@ -179,3 +205,6 @@ body {
   background-color: rgba(75, 83, 32, 0.15);
   border-left: 4px solid #4b5320;
 }
+
+
+

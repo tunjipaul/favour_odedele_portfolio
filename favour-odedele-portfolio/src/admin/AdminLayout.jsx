@@ -5,9 +5,10 @@ import {
   LayoutDashboard,
   Layers3,
   FolderOpen,
-  CalendarDays,
   Image,
   Mail,
+  BookOpen,
+  Users,
   ArrowUpRight,
   LogOut,
   Menu,
@@ -18,7 +19,8 @@ const navItems = [
   { to: '/admin/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/admin/front-page', icon: Layers3, label: 'Front Page' },
   { to: '/admin/projects', icon: FolderOpen, label: 'Highlights' },
-  { to: '/admin/waitlist', icon: CalendarDays, label: 'Community Subscribers' },
+  { to: '/admin/community', icon: Users, label: 'Community' },
+  { to: '/admin/waitlist', icon: BookOpen, label: 'Book Waitlist' },
   { to: '/admin/gallery', icon: Image, label: 'Gallery' },
   { to: '/admin/settings', icon: Mail, label: 'Contact' },
 ];
@@ -63,13 +65,13 @@ function Sidebar({ onClose }) {
             }
           >
             <item.icon className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
-            <span className="hidden sm:inline">{item.label}</span>
+            <span>{item.label}</span>
           </NavLink>
         ))}
       </nav>
 
       <div className="px-4 sm:px-6 py-4 sm:py-6 space-y-2 sm:space-y-3 border-t border-white/5">
-        <a href="/" className="w-full flex items-center justify-center gap-2 py-2 sm:py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs sm:text-sm font-bold transition-all shadow-lg shadow-emerald-500/30" target="_blank" rel="noreferrer">
+        <a href="/" className="w-full flex items-center justify-center gap-2 py-2 sm:py-3 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs sm:text-sm font-bold transition-all" target="_blank" rel="noreferrer">
           <ArrowUpRight className="w-3 h-3 sm:w-4 sm:h-4" />
           <span className="hidden sm:inline">View Live Site</span>
           <span className="sm:hidden">Live Site</span>

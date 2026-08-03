@@ -104,11 +104,11 @@ export default function Hero() {
           </div>
         </div>
         <div className="relative w-full h-[55vw] min-h-[260px] max-h-[420px] overflow-hidden">
-          <img src={settings.portrait} alt={settings.fullName} className="w-full h-full object-cover object-top grayscale hover:grayscale-0 transition-all duration-700" />
+          <img src={settings.portrait} alt={settings.fullName} className="w-full h-full object-cover object-top max-lg:grayscale-0 lg:grayscale lg:hover:grayscale-0 transition-all duration-700" />
           <div className="absolute inset-0 bg-linear-to-t from-[#948a66]/80 via-transparent to-transparent" />
-          <h1 className="absolute bottom-2 left-4 font-black uppercase leading-[0.88]" style={{ fontSize: 'clamp(2.5rem, 12vw, 5rem)' }}>
-            <span className="block" style={{ color: LETTER_COLORS[0] }}>{firstName}</span>
-            <span className="block" style={{ color: LETTER_COLORS[1] }}>{lastName}</span>
+          <h1 className="absolute bottom-2 left-4 font-name leading-[0.88] flex flex-col" style={{ fontSize: 'clamp(2.5rem, 12vw, 5rem)' }}>
+            <span className="flex">{renderNameLine(firstName, 0)}</span>
+            <span className="flex">{renderNameLine(lastName, firstName.length + 1)}</span>
           </h1>
         </div>
         <div className="bg-[#948a66] px-6 py-8 flex flex-col gap-4">
@@ -126,7 +126,7 @@ export default function Hero() {
 
       <div className="hidden lg:flex items-center justify-center py-8 px-8">
         <div
-          className="relative w-full max-w-6xl aspect-16/10 bg-[#948a66] shadow-2xl overflow-hidden flex flex-row rounded-[20px]"
+          className="relative w-full max-w-6xl aspect-16/10 bg-[#948a66] overflow-hidden flex flex-row rounded-[20px]"
           style={{
             opacity: cardVisible ? 1 : 0,
             transform: cardVisible ? 'translateY(0)' : 'translateY(40px)',
@@ -142,14 +142,14 @@ export default function Hero() {
 
           <section className="flex-1 relative flex items-center overflow-hidden">
             <div className="absolute left-[-5%] z-30 pointer-events-none w-full">
-              <h1 className="font-black uppercase flex flex-col leading-[0.88]" style={{ fontSize: 'clamp(3rem, 8vw, 7rem)' }}>
+              <h1 className="font-name flex flex-col leading-[0.88]" style={{ fontSize: 'clamp(3rem, 8vw, 7rem)' }}>
                 <span className="flex">{renderNameLine(firstName, 0)}</span>
                 <span className="flex">{renderNameLine(lastName, firstName.length + 1)}</span>
               </h1>
             </div>
 
-            <div className="ml-auto w-full h-full flex flex-col justify-center items-end pr-12 relative">
-              <div className="z-40 text-right max-w-sm mb-28">
+            <div className="ml-auto w-full h-full flex flex-col justify-end items-end pr-12 pb-20 relative">
+              <div className="z-40 text-right max-w-sm">
                 <p className="text-white text-base font-medium leading-relaxed mb-6">{settings.bioText}</p>
                 <div className="inline-flex gap-3">
                   <button onClick={() => scrollToSection('community')} className="inline-flex items-center gap-2 bg-white text-background-dark px-6 py-3 text-xs font-bold uppercase tracking-widest hover:bg-accent-magenta hover:text-white transition-all duration-300">
@@ -162,7 +162,7 @@ export default function Hero() {
               </div>
 
               <div className="absolute bottom-0 right-0 w-[70%] h-[90%] z-10 overflow-hidden">
-                <img src={settings.portrait} alt={settings.fullName} className="w-full h-full object-cover object-top grayscale hover:grayscale-0 transition-all duration-700" />
+                <img src={settings.portrait} alt={settings.fullName} className="w-full h-full object-cover object-top max-lg:grayscale-0 lg:grayscale lg:hover:grayscale-0 transition-all duration-700" />
               </div>
               <div className="absolute bottom-0 left-0 right-0 h-8 bg-background-dark z-30" />
             </div>
@@ -172,4 +172,5 @@ export default function Hero() {
     </section>
   );
 }
+
 

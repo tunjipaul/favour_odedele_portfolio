@@ -369,7 +369,7 @@ export default function GalleryManager() {
 
       {showForm && (
         <div className="fixed inset-0 z-50 bg-black/60 p-4 flex items-center justify-center">
-          <div className="w-full max-w-lg rounded-2xl border border-white/10 bg-slate-900 text-slate-100 shadow-2xl">
+          <div className="w-full max-w-lg rounded-2xl border border-white/10 bg-slate-900 text-slate-100">
             <div className="px-6 py-4 border-b border-white/10 flex items-center justify-between">
               <h3 className="text-lg font-bold">{editingId ? 'Edit Media' : 'Create Media'}</h3>
               <button
@@ -480,7 +480,7 @@ export default function GalleryManager() {
 
       {confirmingId && (
         <div className="fixed inset-0 z-50 bg-black/60 p-4 flex items-center justify-center">
-          <div className="w-full max-w-md rounded-2xl border border-white/10 bg-slate-900 text-slate-100 shadow-2xl">
+          <div className="w-full max-w-md rounded-2xl border border-white/10 bg-slate-900 text-slate-100">
             <div className="p-6 border-b border-white/10">
               <h3 className="text-lg font-bold">Delete media item?</h3>
               <p className="text-sm text-slate-400 mt-2">This action cannot be undone.</p>

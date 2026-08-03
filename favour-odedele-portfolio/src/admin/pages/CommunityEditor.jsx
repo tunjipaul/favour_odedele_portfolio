@@ -1,0 +1,220 @@
+import { useEffect, useMemo, useState } from 'react';
+import { ArrowUpRight, ExternalLink, Info, Save, Undo2 } from 'lucide-react';
+import { api } from '../utils/api';
+import {
+  DEFAULT_COMMUNITY_SETTINGS,
+  SUBSTACK_DASHBOARD_URL,
+  normalizeCommunitySettings,
+} from '../../data/communitySettings.js';
+
+export default function CommunityEditor() {
+  const [community, setCommunity] = useState(DEFAULT_COMMUNITY_SETTINGS);
+  const [savedSnapshot, setSavedSnapshot] = useState(DEFAULT_COMMUNITY_SETTINGS);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [msg, setMsg] = useState('');
+  const [isError, setIsError] = useState(false);
+
+  const flash = (text, error = false) => {
+    setMsg(text);
+    setIsError(error);
+    setTimeout(() => setMsg(''), 3000);
+  };
+
+  useEffect(() => {
+    let active = true;
+
+    const load = async () => {
+      setLoading(true);
+      try {
+        const data = await api.get('/admin/settings');
+        if (!active) return;
+        const normalized = normalizeCommunitySettings(data?.community);
+        setCommunity(normalized);
+        setSavedSnapshot(normalized);
+      } catch (err) {
+        if (active) flash(err.message || 'Failed to load community settings', true);
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+
+    load();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const updateField = (field, value) => {
+    setCommunity((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const hasChanges = useMemo(
+    () => JSON.stringify(community) !== JSON.stringify(savedSnapshot),
+    [community, savedSnapshot]
+  );
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      const current = await api.get('/admin/settings');
+      const updated = await api.put('/admin/settings', {
+        ...current,
+        community: normalizeCommunitySettings(community),
+      });
+      const normalized = normalizeCommunitySettings(updated?.community);
+      setCommunity(normalized);
+      setSavedSnapshot(normalized);
+      flash('Community section updated successfully.');
+    } catch (err) {
+      flash(err.message || 'Could not save community settings', true);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  if (loading) {
+    return <div className="p-8 text-slate-300">Loading community editor...</div>;
+  }
+
+  return (
+    <div className="px-3 sm:px-4 md:px-6 lg:px-8 py-5 sm:py-6">
+      <div className="mx-auto max-w-6xl">
+        <div className="rounded-2xl border border-white/10 bg-slate-900/60 overflow-hidden">
+          <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-white/10">
+            <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-[0.25em] text-slate-400">Community</p>
+            <div className="mt-2 sm:mt-3 flex flex-col gap-3 sm:gap-4 md:flex-row md:items-end md:justify-between">
+              <div>
+                <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">Edit Community Section</h1>
+                <p className="mt-1 text-xs sm:text-sm text-slate-400 max-w-2xl">
+                  Control the Substack CTA content shown on the public website.
+                </p>
+              </div>
+
+              <div className="flex w-full md:w-auto gap-2 sm:gap-3">
+                <a
+                  href={SUBSTACK_DASHBOARD_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 px-4 sm:px-5 h-9 sm:h-10 rounded-xl border border-white/20 text-slate-100 text-xs sm:text-sm font-semibold hover:bg-white/5"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  Open Substack
+                </a>
+                <button
+                  type="button"
+                  onClick={() => setCommunity(savedSnapshot)}
+                  disabled={!hasChanges || saving}
+                  className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 px-4 sm:px-5 h-9 sm:h-10 rounded-xl border border-white/20 text-slate-100 text-xs sm:text-sm font-semibold hover:bg-white/5 disabled:opacity-50"
+                >
+                  <Undo2 className="w-4 h-4" />
+                  <span className="hidden sm:inline">Discard</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleSave}
+                  disabled={!hasChanges || saving}
+                  className="flex-1 md:flex-none inline-flex items-center justify-center gap-2 px-4 sm:px-5 h-9 sm:h-10 rounded-xl bg-emerald-500 text-slate-950 text-xs sm:text-sm font-bold hover:bg-emerald-400 disabled:opacity-50"
+                >
+                  <Save className="w-4 h-4" />
+                  {saving ? 'Saving...' : 'Publish'}
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {msg && (
+            <div
+              className={`mx-4 sm:mx-6 mt-4 rounded-xl border px-4 py-3 text-xs sm:text-sm ${
+                isError ? 'border-red-400/40 bg-red-500/10 text-red-200' : 'border-emerald-400/40 bg-emerald-500/10 text-emerald-200'
+              }`}
+            >
+              {msg}
+            </div>
+          )}
+
+          <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+            <div className="rounded-xl border border-blue-400/20 bg-blue-500/10 p-4 flex items-start gap-3">
+              <Info className="w-4 h-4 mt-0.5 text-blue-300 shrink-0" />
+              <p className="text-xs leading-relaxed text-blue-100">
+                Community subscriptions are managed on Substack. This section only controls the content and destination link displayed on the website.
+              </p>
+            </div>
+
+            <section className="rounded-2xl border border-white/10 bg-slate-950/50 overflow-hidden">
+              <div className="px-4 sm:px-5 py-3 sm:py-4 border-b border-white/10">
+                <h2 className="text-base sm:text-lg font-bold text-white">Public Section Content</h2>
+              </div>
+              <div className="p-4 sm:p-5 space-y-4 sm:space-y-5">
+                <label className="block">
+                  <span className="mb-2 block text-xs sm:text-sm font-semibold text-slate-200">Section title</span>
+                  <input
+                    value={community.title}
+                    onChange={(event) => updateField('title', event.target.value)}
+                    className="w-full h-10 sm:h-11 rounded-xl border border-white/15 bg-slate-900 px-3 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-400/60"
+                  />
+                </label>
+
+                <label className="block">
+                  <span className="mb-2 block text-xs sm:text-sm font-semibold text-slate-200">Section description</span>
+                  <textarea
+                    value={community.description}
+                    onChange={(event) => updateField('description', event.target.value)}
+                    rows={4}
+                    className="w-full rounded-xl border border-white/15 bg-slate-900 px-3 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-400/60"
+                  />
+                </label>
+
+                <label className="block">
+                  <span className="mb-2 block text-xs sm:text-sm font-semibold text-slate-200">Button text</span>
+                  <input
+                    value={community.buttonText}
+                    onChange={(event) => updateField('buttonText', event.target.value)}
+                    className="w-full h-10 sm:h-11 rounded-xl border border-white/15 bg-slate-900 px-3 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-400/60"
+                  />
+                </label>
+
+                <label className="block">
+                  <span className="mb-2 block text-xs sm:text-sm font-semibold text-slate-200">Substack URL</span>
+                  <input
+                    type="url"
+                    value={community.substackUrl}
+                    onChange={(event) => updateField('substackUrl', event.target.value)}
+                    className="w-full h-10 sm:h-11 rounded-xl border border-white/15 bg-slate-900 px-3 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-emerald-400/60"
+                    placeholder="https://favourodedele.substack.com/subscribe"
+                  />
+                </label>
+
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={community.openInNewTab}
+                    onChange={(event) => updateField('openInNewTab', event.target.checked)}
+                    className="h-4 w-4 rounded border-white/20 bg-slate-900 text-emerald-500 focus:ring-emerald-400/60"
+                  />
+                  <span className="text-sm text-slate-200">Open in new tab</span>
+                </label>
+              </div>
+            </section>
+
+            <section className="rounded-2xl border border-white/10 bg-background-muted text-slate-950 overflow-hidden">
+              <div className="px-4 sm:px-5 py-3 sm:py-4 border-b border-slate-200/80">
+                <h2 className="text-base sm:text-lg font-bold">Preview</h2>
+              </div>
+              <div className="p-6 sm:p-8 text-center">
+                <h3 className="text-2xl sm:text-3xl font-black tracking-tight leading-tight">{community.title}</h3>
+                <p className="mt-4 text-sm sm:text-base leading-relaxed text-slate-600 max-w-2xl mx-auto">{community.description}</p>
+                <div className="mt-8">
+                  <span className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-950 px-6 py-3 text-xs font-black uppercase tracking-widest text-white">
+                    {community.buttonText}
+                    <ArrowUpRight className="w-4 h-4" aria-hidden="true" />
+                  </span>
+                </div>
+              </div>
+            </section>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

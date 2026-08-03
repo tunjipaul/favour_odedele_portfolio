@@ -1,28 +1,29 @@
 import { useEffect, useMemo, useState } from 'react';
 import { ImagePlus, Info, Save, Undo2, Upload } from 'lucide-react';
 import { api } from '../utils/api';
-
-const EMPTY_SETTINGS = {
-  hero: {
-    fullName: '',
-    bioText: '',
-    portrait: '',
-  },
-};
+import {
+  DEFAULT_HIGHLIGHTS_SECTION,
+  normalizeAboutSettings,
+  normalizeHighlightsSection,
+} from '../../data/frontPageSettings.js';
 
 function safeSettingsShape(data) {
   return {
     ...data,
     hero: {
-      ...EMPTY_SETTINGS.hero,
+      fullName: '',
+      bioText: '',
+      portrait: '',
       ...(data?.hero || {}),
     },
+    about: normalizeAboutSettings(data?.about),
+    highlightsSection: normalizeHighlightsSection(data?.highlightsSection),
   };
 }
 
 export default function FrontPageEditor() {
-  const [settings, setSettings] = useState(EMPTY_SETTINGS);
-  const [savedSnapshot, setSavedSnapshot] = useState(EMPTY_SETTINGS);
+  const [settings, setSettings] = useState(() => safeSettingsShape({}));
+  const [savedSnapshot, setSavedSnapshot] = useState(() => safeSettingsShape({}));
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [msg, setMsg] = useState('');
@@ -62,10 +63,33 @@ export default function FrontPageEditor() {
   const updateHero = (key, value) => {
     setSettings((prev) => ({
       ...prev,
-      hero: {
-        ...prev.hero,
-        [key]: value,
+      hero: { ...prev.hero, [key]: value },
+    }));
+  };
+
+  const updateAbout = (key, value) => {
+    setSettings((prev) => ({
+      ...prev,
+      about: { ...prev.about, [key]: value },
+    }));
+  };
+
+  const updateAboutFocusArea = (index, field, value) => {
+    setSettings((prev) => ({
+      ...prev,
+      about: {
+        ...prev.about,
+        focusAreas: prev.about.focusAreas.map((item, itemIndex) =>
+          itemIndex === index ? { ...item, [field]: value } : item
+        ),
       },
+    }));
+  };
+
+  const updateHighlightsSection = (key, value) => {
+    setSettings((prev) => ({
+      ...prev,
+      highlightsSection: { ...prev.highlightsSection, [key]: value },
     }));
   };
 
@@ -77,7 +101,13 @@ export default function FrontPageEditor() {
   const handleSave = async () => {
     setSaving(true);
     try {
-      const updated = await api.put('/admin/settings', settings);
+      const current = await api.get('/admin/settings');
+      const updated = await api.put('/admin/settings', {
+        ...current,
+        hero: settings.hero,
+        about: normalizeAboutSettings(settings.about),
+        highlightsSection: normalizeHighlightsSection(settings.highlightsSection),
+      });
       const shaped = safeSettingsShape(updated);
       setSettings(shaped);
       setSavedSnapshot(shaped);
@@ -120,9 +150,9 @@ export default function FrontPageEditor() {
             <p className="text-[10px] sm:text-xs font-semibold uppercase tracking-[0.25em] text-slate-400">Front Page</p>
             <div className="mt-2 sm:mt-3 flex flex-col gap-3 sm:gap-4 md:flex-row md:items-end md:justify-between">
               <div>
-                <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">Edit Hero Section</h1>
+                <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">Edit Front Page</h1>
                 <p className="mt-1 text-xs sm:text-sm text-slate-400 max-w-2xl">
-                  Configure the personal-brand message and portrait used at the top of the site.
+                  Manage the hero, About Me, and Major Highlights section copy shown on the public site.
                 </p>
               </div>
 
@@ -158,7 +188,7 @@ export default function FrontPageEditor() {
           <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
             <section className="rounded-2xl border border-white/10 bg-slate-950/50 overflow-hidden">
               <div className="px-4 sm:px-5 py-3 sm:py-4 border-b border-white/10">
-                <h2 className="text-base sm:text-lg font-bold text-white">Text Content</h2>
+                <h2 className="text-base sm:text-lg font-bold text-white">Hero</h2>
               </div>
               <div className="p-4 sm:p-5 space-y-4 sm:space-y-5">
                 <label className="block">
@@ -217,13 +247,112 @@ export default function FrontPageEditor() {
                       disabled={uploadingPortrait}
                     />
                   </label>
+                </div>
+              </div>
+            </section>
 
-                  <div className="rounded-xl border border-blue-400/20 bg-blue-500/10 p-4 flex items-start gap-3">
-                    <Info className="w-4 h-4 mt-0.5 text-blue-300 shrink-0" />
-                    <p className="text-xs leading-relaxed text-blue-100">
-                      This page edits the hero headline, introduction, and portrait. Extra document assets are intentionally not part of the public site.
-                    </p>
-                  </div>
+            <section className="rounded-2xl border border-white/10 bg-slate-950/50 overflow-hidden">
+              <div className="px-4 sm:px-5 py-3 sm:py-4 border-b border-white/10">
+                <h2 className="text-base sm:text-lg font-bold text-white">About Me</h2>
+              </div>
+              <div className="p-4 sm:p-5 space-y-4 sm:space-y-5">
+                <label className="block">
+                  <span className="mb-2 block text-xs sm:text-sm font-semibold text-slate-200">Section label</span>
+                  <input
+                    value={settings.about.eyebrow}
+                    onChange={(event) => updateAbout('eyebrow', event.target.value)}
+                    className="w-full h-10 sm:h-11 rounded-xl border border-white/15 bg-slate-900 px-3 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-orange-400/60"
+                  />
+                </label>
+                <label className="block">
+                  <span className="mb-2 block text-xs sm:text-sm font-semibold text-slate-200">Heading</span>
+                  <textarea
+                    value={settings.about.heading}
+                    onChange={(event) => updateAbout('heading', event.target.value)}
+                    rows={2}
+                    className="w-full rounded-xl border border-white/15 bg-slate-900 px-3 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-orange-400/60"
+                  />
+                </label>
+                <label className="block">
+                  <span className="mb-2 block text-xs sm:text-sm font-semibold text-slate-200">First paragraph</span>
+                  <textarea
+                    value={settings.about.paragraph1}
+                    onChange={(event) => updateAbout('paragraph1', event.target.value)}
+                    rows={4}
+                    className="w-full rounded-xl border border-white/15 bg-slate-900 px-3 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-orange-400/60"
+                  />
+                </label>
+                <label className="block">
+                  <span className="mb-2 block text-xs sm:text-sm font-semibold text-slate-200">Second paragraph</span>
+                  <textarea
+                    value={settings.about.paragraph2}
+                    onChange={(event) => updateAbout('paragraph2', event.target.value)}
+                    rows={4}
+                    className="w-full rounded-xl border border-white/15 bg-slate-900 px-3 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-orange-400/60"
+                  />
+                </label>
+                <label className="block">
+                  <span className="mb-2 block text-xs sm:text-sm font-semibold text-slate-200">Book badge</span>
+                  <input
+                    value={settings.about.bookBadge}
+                    onChange={(event) => updateAbout('bookBadge', event.target.value)}
+                    className="w-full h-10 sm:h-11 rounded-xl border border-white/15 bg-slate-900 px-3 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-orange-400/60"
+                  />
+                </label>
+
+                <div className="space-y-4 pt-2">
+                  <p className="text-xs sm:text-sm font-semibold text-slate-200">Focus areas</p>
+                  {settings.about.focusAreas.map((area, index) => (
+                    <div key={`focus-${index}`} className="rounded-xl border border-white/10 bg-slate-900/70 p-4 space-y-3">
+                      <p className="text-[10px] uppercase tracking-[0.25em] text-slate-400">Card {index + 1}</p>
+                      <input
+                        value={area.title}
+                        onChange={(event) => updateAboutFocusArea(index, 'title', event.target.value)}
+                        placeholder="Title"
+                        className="w-full h-10 rounded-xl border border-white/15 bg-slate-900 px-3 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-orange-400/60"
+                      />
+                      <textarea
+                        value={area.description}
+                        onChange={(event) => updateAboutFocusArea(index, 'description', event.target.value)}
+                        rows={3}
+                        placeholder="Description"
+                        className="w-full rounded-xl border border-white/15 bg-slate-900 px-3 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-orange-400/60"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            <section className="rounded-2xl border border-white/10 bg-slate-950/50 overflow-hidden">
+              <div className="px-4 sm:px-5 py-3 sm:py-4 border-b border-white/10">
+                <h2 className="text-base sm:text-lg font-bold text-white">Major Highlights Section</h2>
+              </div>
+              <div className="p-4 sm:p-5 space-y-4 sm:space-y-5">
+                <label className="block">
+                  <span className="mb-2 block text-xs sm:text-sm font-semibold text-slate-200">Section label</span>
+                  <input
+                    value={settings.highlightsSection.eyebrow}
+                    onChange={(event) => updateHighlightsSection('eyebrow', event.target.value)}
+                    className="w-full h-10 sm:h-11 rounded-xl border border-white/15 bg-slate-900 px-3 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-orange-400/60"
+                    placeholder={DEFAULT_HIGHLIGHTS_SECTION.eyebrow}
+                  />
+                </label>
+                <label className="block">
+                  <span className="mb-2 block text-xs sm:text-sm font-semibold text-slate-200">Heading</span>
+                  <textarea
+                    value={settings.highlightsSection.heading}
+                    onChange={(event) => updateHighlightsSection('heading', event.target.value)}
+                    rows={2}
+                    className="w-full rounded-xl border border-white/15 bg-slate-900 px-3 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-orange-400/60"
+                    placeholder={DEFAULT_HIGHLIGHTS_SECTION.heading}
+                  />
+                </label>
+                <div className="rounded-xl border border-blue-400/20 bg-blue-500/10 p-4 flex items-start gap-3">
+                  <Info className="w-4 h-4 mt-0.5 text-blue-300 shrink-0" />
+                  <p className="text-xs leading-relaxed text-blue-100">
+                    Individual highlight cards are managed under Admin → Highlights. All published highlights appear on the homepage, ordered by their homepage order number.
+                  </p>
                 </div>
               </div>
             </section>
@@ -233,6 +362,3 @@ export default function FrontPageEditor() {
     </div>
   );
 }
-
-
-

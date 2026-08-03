@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, CloudUpload, ListChecks, Bell, Users, FolderOpen, Image as ImageIcon } from 'lucide-react';
+import { Plus, CloudUpload, Users, FolderOpen, Image as ImageIcon } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { api } from '../utils/api';
 
@@ -22,12 +22,12 @@ const quickActions = [
     to: '/admin/gallery',
   },
   {
-    title: 'Manage Community',
-    description: 'View community subscribers',
-    Icon: ListChecks,
+    title: 'Edit Community',
+    description: 'Update the Substack CTA on the website',
+    Icon: Users,
     accent: 'bg-slate-800 text-slate-100',
     iconBg: 'bg-slate-800/70',
-    to: '/admin/waitlist',
+    to: '/admin/community',
   },
 ];
 
@@ -69,9 +69,9 @@ const formatDateTime = (value) => {
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-slate-900 border border-white/10 p-3 rounded-lg shadow-xl">
+      <div className="bg-slate-900 border border-white/10 p-3 rounded-lg">
         <p className="text-[10px] uppercase tracking-widest text-slate-400 mb-1">{label}</p>
-        <p className="text-sm font-bold text-emerald-400">{payload[0].value} New Subscribers</p>
+        <p className="text-sm font-bold text-emerald-400">{payload[0].value} New Signups</p>
       </div>
     );
   }
@@ -148,7 +148,7 @@ export default function Dashboard() {
   };
 
   const statsCards = [
-    { label: 'Community Subscribers', value: counts.waitlist, Icon: Users, tone: 'text-emerald-400 bg-emerald-600/10' },
+    { label: 'Book Waitlist', value: counts.waitlist, Icon: Users, tone: 'text-emerald-400 bg-emerald-600/10' },
     { label: 'Published Highlights', value: counts.projects, Icon: FolderOpen, tone: 'text-slate-100 bg-slate-800/40' },
     { label: 'Gallery Items', value: counts.gallery, Icon: ImageIcon, tone: 'text-slate-100 bg-slate-800/40' },
   ];
@@ -174,7 +174,7 @@ export default function Dashboard() {
             <Link 
               key={action.title} 
               to={action.to}
-              className={`rounded-2xl border border-white/10 p-6 bg-gradient-to-br from-slate-900/80 to-slate-900/90 transition-all hover:scale-[1.02] hover:shadow-xl active:scale-[0.98] ${action.accent}`}
+              className={`rounded-2xl border border-white/10 p-6 bg-gradient-to-br from-slate-900/80 to-slate-900/90 transition-all hover:scale-[1.02] active:scale-[0.98] ${action.accent}`}
             >
               <div className={`inline-flex items-center justify-center w-12 h-12 rounded-2xl mb-4 ${action.iconBg}`}>
                 <action.Icon className="w-5 h-5" />
@@ -186,11 +186,11 @@ export default function Dashboard() {
         </section>
 
         <section className="grid grid-cols-1 xl:grid-cols-3 gap-8">
-          <div className="xl:col-span-2 bg-slate-900/80 border border-white/10 rounded-2xl p-6 shadow-inner shadow-black/40">
+          <div className="xl:col-span-2 bg-slate-900/80 border border-white/10 rounded-2xl p-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6">
               <div>
-                <p className="text-sm text-slate-400 uppercase tracking-[0.4em]">Community Growth</p>
-                <p className="text-xs text-slate-500">Daily subscribers over the last 30 days</p>
+                <p className="text-sm text-slate-400 uppercase tracking-[0.4em]">Book Waitlist Growth</p>
+                <p className="text-xs text-slate-500">Daily book waitlist signups over the last 30 days</p>
               </div>
               <span className="self-start px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-semibold">{calculateGrowth()} this month</span>
             </div>
@@ -287,8 +287,8 @@ export default function Dashboard() {
           <div className="bg-slate-900/80 border border-white/10 rounded-2xl overflow-hidden">
             <div className="px-4 sm:px-6 py-4 sm:py-5 border-b border-white/5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Community</p>
-                <h2 className="text-base sm:text-lg font-bold">Recent Subscribers</h2>
+                <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Book Waitlist</p>
+                <h2 className="text-base sm:text-lg font-bold">Recent Signups</h2>
               </div>
               <Link to="/admin/waitlist" className="text-emerald-300 text-xs font-semibold hover:text-emerald-200">
                 View All
@@ -314,7 +314,7 @@ export default function Dashboard() {
                     ))
                   ) : (
                     <tr>
-                      <td colSpan="2" className="px-4 py-8 text-center text-slate-500">No subscribers yet</td>
+                      <td colSpan="2" className="px-4 py-8 text-center text-slate-500">No book waitlist signups yet</td>
                     </tr>
                   )}
                 </tbody>

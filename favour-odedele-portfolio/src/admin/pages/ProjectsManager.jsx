@@ -24,6 +24,8 @@ const FILTERS = [
   { label: 'Drafts', key: 'drafts' },
 ];
 
+const TAG_OPTIONS = ['Writing', 'Leadership', 'Community', 'Speaking'];
+
 export default function ProjectsManager() {
   const [projects, setProjects] = useState([]);
   const [form, setForm] = useState(EMPTY_FORM);
@@ -104,15 +106,22 @@ export default function ProjectsManager() {
   };
 
   const filteredProjects = useMemo(() => {
-    return projects.filter((project) => {
-      const matchesFilter =
-        activeFilter === 'all' ? true : activeFilter === 'published' ? project.isVisible : !project.isVisible;
-      const matchesSearch = project.title
-        ? project.title.toLowerCase().includes(searchTerm.toLowerCase())
-        : true;
-      return matchesFilter && matchesSearch;
-    });
+    return projects
+      .filter((project) => {
+        const matchesFilter =
+          activeFilter === 'all' ? true : activeFilter === 'published' ? project.isVisible : !project.isVisible;
+        const matchesSearch = project.title
+          ? project.title.toLowerCase().includes(searchTerm.toLowerCase())
+          : true;
+        return matchesFilter && matchesSearch;
+      })
+      .sort((a, b) => (a.order || 0) - (b.order || 0));
   }, [projects, activeFilter, searchTerm]);
+
+  const publishedCount = useMemo(
+    () => projects.filter((project) => project.isVisible !== false).length,
+    [projects]
+  );
 
   const openNewForm = () => {
     setForm(EMPTY_FORM);
@@ -140,7 +149,10 @@ export default function ProjectsManager() {
               <p className="text-[10px] sm:text-xs uppercase tracking-[0.4em] sm:tracking-[0.5em] text-emerald-300">Highlights</p>
               <h1 className="text-2xl sm:text-3xl font-black leading-tight">Manage personal highlights</h1>
               <p className="text-xs sm:text-sm text-slate-300 mt-1">
-                Publish the three personal milestones shown on the homepage.
+                Manage the highlight cards shown in the homepage Major Highlights section. All published highlights appear on the site, ordered by homepage order.
+              </p>
+              <p className="text-xs text-emerald-200/90 mt-2">
+                {publishedCount} published on homepage
               </p>
             </div>
             <button
@@ -198,12 +210,13 @@ export default function ProjectsManager() {
             </div>
           </div>
 
-          <section className="overflow-hidden rounded-2xl bg-white/5 border border-white/10 shadow-inner">
+          <section className="overflow-hidden rounded-2xl bg-white/5 border border-white/10">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs sm:text-sm">
                 <thead className="bg-slate-900/70 text-slate-200">
                   <tr>
                     <th className="px-3 sm:px-6 py-3 sm:py-4 text-[10px] sm:text-xs font-semibold uppercase tracking-[0.3em] sm:tracking-[0.35em]">Image</th>
+                    <th className="px-3 sm:px-6 py-3 sm:py-4 text-[10px] sm:text-xs font-semibold uppercase tracking-[0.3em] sm:tracking-[0.35em] hidden md:table-cell">Order</th>
                     <th className="px-3 sm:px-6 py-3 sm:py-4 text-[10px] sm:text-xs font-semibold uppercase tracking-[0.3em] sm:tracking-[0.35em]">Title</th>
                     <th className="px-3 sm:px-6 py-3 sm:py-4 text-[10px] sm:text-xs font-semibold uppercase tracking-[0.3em] sm:tracking-[0.35em] hidden sm:table-cell">Status</th>
                     <th className="px-3 sm:px-6 py-3 sm:py-4 text-[10px] sm:text-xs font-semibold uppercase tracking-[0.3em] sm:tracking-[0.35em] hidden lg:table-cell">Tag</th>
@@ -212,9 +225,9 @@ export default function ProjectsManager() {
                 </thead>
                 <tbody className="divide-y divide-white/5">
                   {loadingProjects ? (
-                    <tr><td colSpan={5} className="px-6 py-8 text-center text-slate-400">Loading...</td></tr>
+                    <tr><td colSpan={6} className="px-6 py-8 text-center text-slate-400">Loading...</td></tr>
                   ) : filteredProjects.length === 0 ? (
-                    <tr><td colSpan={5} className="px-6 py-8 text-center text-slate-400">No highlights match your filter.</td></tr>
+                    <tr><td colSpan={6} className="px-6 py-8 text-center text-slate-400">No highlights match your filter.</td></tr>
                   ) : (
                     filteredProjects.map((project) => (
                       <tr key={project._id} className="hover:bg-white/5 transition-colors">
@@ -225,6 +238,7 @@ export default function ProjectsManager() {
                             <div className="w-12 h-9 sm:w-16 sm:h-12 rounded-lg border border-white/10 bg-slate-900/60 text-[8px] sm:text-[10px] uppercase tracking-wide text-slate-500 grid place-items-center">No Image</div>
                           )}
                         </td>
+                        <td className="px-3 sm:px-6 py-3 sm:py-5 hidden md:table-cell text-slate-300">{project.order ?? 0}</td>
                         <td className="px-3 sm:px-6 py-3 sm:py-5">
                           <span className="font-semibold text-white text-xs sm:text-sm truncate">{project.title}</span>
                         </td>
@@ -258,14 +272,14 @@ export default function ProjectsManager() {
       </div>
 
       {msg && (
-        <div className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:bottom-6 sm:max-w-sm rounded-2xl bg-emerald-500/90 px-5 py-3 text-sm font-semibold text-slate-950 shadow-2xl">
+        <div className="fixed bottom-4 left-4 right-4 sm:left-auto sm:right-6 sm:bottom-6 sm:max-w-sm rounded-2xl bg-emerald-500/90 px-5 py-3 text-sm font-semibold text-slate-950">
           {msg}
         </div>
       )}
 
       {showForm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-white rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex items-center justify-between p-6 border-b">
               <h3 className="text-lg font-bold text-slate-900">{editingId ? 'Edit Highlight' : 'New Highlight'}</h3>
               <button onClick={() => setShowForm(false)} className="text-gray-500 hover:text-gray-700" aria-label="Close form">
@@ -275,7 +289,6 @@ export default function ProjectsManager() {
             <form onSubmit={handleSubmit} className="p-6 space-y-4 text-slate-900">
               {[
                 ['title', 'Title'],
-                ['tag', 'Tag'],
                 ['description', 'Description'],
                 ['keyOutput', 'Key Detail'],
               ].map(([field, label]) => (
@@ -289,10 +302,20 @@ export default function ProjectsManager() {
                 </div>
               ))}
 
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Tag</label>
+                <select value={form.tag} onChange={(event) => setForm({ ...form, tag: event.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#064E3B]">
+                  {TAG_OPTIONS.map((tag) => (
+                    <option key={tag} value={tag}>{tag}</option>
+                  ))}
+                </select>
+              </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <label className="block">
-                  <span className="block text-sm font-medium text-gray-700 mb-1">Order</span>
-                  <input type="number" value={form.order ?? 0} onChange={(event) => setForm({ ...form, order: Number(event.target.value || 0) })} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#064E3B]" />
+                  <span className="block text-sm font-medium text-gray-700 mb-1">Homepage order</span>
+                  <input type="number" min="0" value={form.order ?? 0} onChange={(event) => setForm({ ...form, order: Number(event.target.value || 0) })} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#064E3B]" />
+                  <p className="mt-1 text-xs text-gray-500">Lower numbers appear first on the homepage.</p>
                 </label>
                 <label className="block">
                   <span className="block text-sm font-medium text-gray-700 mb-1">Accent</span>
@@ -339,7 +362,7 @@ export default function ProjectsManager() {
 
       {confirmingId && (
         <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm">
+          <div className="bg-white rounded-2xl w-full max-w-sm">
             <div className="p-6 border-b">
               <h3 className="text-lg font-bold text-gray-900">Delete highlight?</h3>
               <p className="mt-2 text-sm text-gray-600">This action cannot be undone.</p>

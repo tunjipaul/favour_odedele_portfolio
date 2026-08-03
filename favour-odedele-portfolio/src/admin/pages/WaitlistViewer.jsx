@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { api } from '../utils/api';
-import { Mail, Upload } from 'lucide-react';
+import { Upload } from 'lucide-react';
 import { DEFAULT_BOOK_SETTINGS, normalizeBookSettings } from '../../data/bookSettings.js';
 
 const formatDate = (iso) =>
@@ -30,7 +30,7 @@ export default function WaitlistViewer() {
         setEntries(Array.isArray(subscriberData) ? subscriberData : []);
         setBook(normalizeBookSettings(settingsData?.book));
       } catch (error) {
-        console.error('Failed to load community subscribers and book settings', error);
+        console.error('Failed to load book waitlist and book settings', error);
       } finally {
         setLoading(false);
       }
@@ -79,10 +79,10 @@ export default function WaitlistViewer() {
     <div className="min-h-screen bg-background-dark text-white">
       <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-6 sm:py-8 md:py-10 space-y-6 sm:space-y-8">
         <header className="flex flex-col gap-2 sm:gap-3">
-          <p className="text-xs uppercase tracking-[0.4em] sm:tracking-[0.5em] text-emerald-300">Community</p>
-          <h1 className="text-2xl sm:text-3xl font-black">Community Subscribers</h1>
+          <p className="text-xs uppercase tracking-[0.4em] sm:tracking-[0.5em] text-emerald-300">Book</p>
+          <h1 className="text-2xl sm:text-3xl font-black">Book Waitlist</h1>
           <p className="text-xs sm:text-sm text-slate-300 max-w-2xl">
-            Manage book content and review everyone who has joined Favour's community list.
+            Manage book content and review everyone who has joined the waitlist for Becoming the 1%.
           </p>
         </header>
 
@@ -164,21 +164,15 @@ export default function WaitlistViewer() {
         </section>
 
         <section className="bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-6">
-          <div className="flex flex-col gap-3 sm:gap-4 mb-4 sm:mb-5">
-            <div>
-              <p className="text-[10px] sm:text-xs uppercase tracking-[0.3em] sm:tracking-[0.4em] text-slate-400">Current subscribers</p>
-              <h2 className="text-lg sm:text-xl font-semibold">{entries.length} subscribers</h2>
-            </div>
-            <button className="w-full sm:w-auto flex items-center justify-center sm:justify-start gap-2 rounded-xl border border-white/20 px-4 py-2 text-[10px] sm:text-xs uppercase tracking-[0.2em] sm:tracking-[0.3em] text-slate-200 hover:border-white/40">
-              <Mail className="w-4 h-4" />
-              Export list
-            </button>
+          <div className="mb-4 sm:mb-5">
+            <p className="text-[10px] sm:text-xs uppercase tracking-[0.3em] sm:tracking-[0.4em] text-slate-400">Book waitlist</p>
+            <h2 className="text-lg sm:text-xl font-semibold">{entries.length} signups</h2>
           </div>
 
           {loading ? (
             <div className="text-xs sm:text-sm text-slate-400">Loading...</div>
           ) : entries.length === 0 ? (
-            <p className="text-xs sm:text-sm text-slate-500">No subscribers yet.</p>
+            <p className="text-xs sm:text-sm text-slate-500">No book waitlist signups yet.</p>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs sm:text-sm">

@@ -7,7 +7,6 @@ export default function SettingsEditor() {
     linkedIn: '',
     bookCall: '',
     twitter: '',
-    substack: '',
   });
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState('');
@@ -87,14 +86,6 @@ export default function SettingsEditor() {
               <input
                 value={footer.twitter || ''}
                 onChange={(e) => updateField('twitter', e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#064E3B]"
-              />
-            </div>
-            <div>
-              <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Substack URL</label>
-              <input
-                value={footer.substack || ''}
-                onChange={(e) => updateField('substack', e.target.value)}
                 className="w-full px-3 py-2 border border-gray-300 rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#064E3B]"
               />
             </div>

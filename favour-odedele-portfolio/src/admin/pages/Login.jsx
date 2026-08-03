@@ -30,7 +30,7 @@ export default function Login() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#042a3c] to-[#051f2c] px-4 py-10 flex items-center justify-center">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 items-center">
-        <div className="flex-1 text-center rounded-3xl border border-white/10 bg-white/10 p-8 text-white shadow-2xl lg:text-left">
+        <div className="flex-1 text-center rounded-3xl border border-white/10 bg-white/10 p-8 text-white lg:text-left">
           <p className="text-xs uppercase tracking-[0.4em] text-emerald-300">Admin Portal</p>
           <h1 className="mt-4 text-4xl font-black">Welcome back, Favour Odedele</h1>
           <p className="mt-4 text-sm text-white/70">
@@ -39,7 +39,7 @@ export default function Login() {
         </div>
 
         <div className="w-full max-w-md">
-          <div className="w-full rounded-3xl border border-white/10 bg-white/90 p-8 shadow-[0_20px_60px_rgba(0,0,0,0.35)] backdrop-blur">
+          <div className="w-full rounded-3xl border border-white/10 bg-white/90 p-8 backdrop-blur">
             <h2 className="text-lg font-bold text-gray-800 mb-6">Sign in to continue</h2>
 
             {error && (

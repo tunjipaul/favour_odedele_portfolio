@@ -79,8 +79,45 @@ const siteSettings = {
     linkedIn: '',
     email: '',
     bookCall: '',
-    substack: '',
     twitter: '',
+  },
+  community: {
+    title: 'Join my community on Substack',
+    description:
+      'Join my community on Substack for essays, reflections, opportunities, book updates, and insights on education, leadership, entrepreneurship, and personal growth.',
+    buttonText: 'Join my community on Substack',
+    substackUrl: 'https://favourodedele.substack.com/subscribe',
+    openInNewTab: true,
+  },
+  about: {
+    eyebrow: 'About Me',
+    heading: 'I am building a life around ideas, people, and personal becoming.',
+    paragraph1:
+      'My work sits at the intersection of education, leadership, writing, and community. I am drawn to the question of how people grow: what shapes discipline, what gives people courage, and what kind of environments help them become more than they once imagined.',
+    paragraph2:
+      'This site is a home for my personal reflections, independent initiatives, book updates, community experiments, and the work I am gradually building as a future social entrepreneur.',
+    bookBadge: 'Author of Becoming the 1%',
+    focusAreas: [
+      {
+        title: 'Education and growth',
+        description:
+          'I care about learning as a personal discipline and as a tool for helping people see wider possibilities for their lives.',
+      },
+      {
+        title: 'Ideas in public',
+        description:
+          'I write, reflect, and build around leadership, entrepreneurship, identity, discipline, and becoming a more intentional person.',
+      },
+      {
+        title: 'Community building',
+        description:
+          'I am interested in rooms, circles, and initiatives that help people find clarity, accountability, and courage to move forward.',
+      },
+    ],
+  },
+  highlightsSection: {
+    eyebrow: 'Major Highlights',
+    heading: 'A few personal milestones from the work I am building.',
   },
 };
 

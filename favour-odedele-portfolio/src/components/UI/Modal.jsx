@@ -25,7 +25,7 @@ export default function Modal({ isOpen, onClose, children, title }) {
       />
 
       {/* Modal Content */}
-      <div className="relative bg-white rounded-xl sm:rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-in">
+      <div className="relative bg-white rounded-xl sm:rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto animate-in">
         {/* Header */}
         <div className="sticky top-0 bg-white/95 backdrop-blur-sm flex items-center justify-between p-4 sm:p-6 border-b border-slate-100 rounded-t-xl sm:rounded-t-2xl">
           <h3 className="text-lg sm:text-xl font-bold pr-4">{title}</h3>

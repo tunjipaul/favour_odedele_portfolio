@@ -12,7 +12,7 @@ export default function ProjectCard({ project }) {
 
   return (
     <div
-      className="flex flex-col bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-xl border border-slate-200 cursor-pointer group hover:shadow-2xl transition-all duration-300"
+      className="flex flex-col bg-white rounded-xl sm:rounded-2xl overflow-hidden border border-slate-200 cursor-pointer group transition-all duration-300"
       onClick={() => openProject(project)}
     >
       {/* Image */}

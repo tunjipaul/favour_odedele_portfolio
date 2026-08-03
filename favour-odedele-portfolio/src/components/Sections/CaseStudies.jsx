@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Award, BookOpen, Megaphone, Sparkles, X } from 'lucide-react';
 import { projects as fallbackProjects } from '../../data/projects';
 import { API_BASE_URL } from '../../config.js';
+import { DEFAULT_HIGHLIGHTS_SECTION, normalizeHighlightsSection } from '../../data/frontPageSettings.js';
 
 const API = API_BASE_URL;
 const iconByTag = {
@@ -14,22 +15,25 @@ const iconByTag = {
 const visibleHighlights = (items = []) =>
   items
     .filter((item) => (item.category || 'highlight') === 'highlight' && item.isVisible !== false)
-    .sort((a, b) => (a.order || 0) - (b.order || 0))
-    .slice(0, 3);
+    .sort((a, b) => (a.order || 0) - (b.order || 0));
 
 export default function Highlights() {
   const [highlights, setHighlights] = useState(visibleHighlights(fallbackProjects));
+  const [sectionCopy, setSectionCopy] = useState(DEFAULT_HIGHLIGHTS_SECTION);
   const [activeHighlight, setActiveHighlight] = useState(null);
 
   useEffect(() => {
     let active = true;
 
-    fetch(`${API}/projects`)
-      .then((res) => res.json())
-      .then((data) => {
+    Promise.all([
+      fetch(`${API}/projects`).then((res) => res.json()),
+      fetch(`${API}/settings`).then((res) => res.json()),
+    ])
+      .then(([projectData, settingsData]) => {
         if (!active) return;
-        const next = visibleHighlights(Array.isArray(data) ? data : []);
+        const next = visibleHighlights(Array.isArray(projectData) ? projectData : []);
         if (next.length) setHighlights(next);
+        setSectionCopy(normalizeHighlightsSection(settingsData?.highlightsSection));
       })
       .catch(() => {});
 
@@ -43,10 +47,10 @@ export default function Highlights() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="max-w-3xl mb-10 sm:mb-14">
           <p className="text-primary font-bold tracking-widest uppercase text-xs sm:text-sm mb-4">
-            Three Highlights
+            {sectionCopy.eyebrow}
           </p>
-          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight text-slate-950">
-            A few personal milestones from the work I am building.
+          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-normal leading-snug text-slate-950">
+            {sectionCopy.heading}
           </h2>
         </div>
 
@@ -58,7 +62,7 @@ export default function Highlights() {
                 type="button"
                 key={highlight._id || highlight.id || `${highlight.title}-${index}`}
                 onClick={() => setActiveHighlight(highlight)}
-                className="group text-left bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-xl transition-all"
+                className="group text-left bg-white border border-slate-200 rounded-xl overflow-hidden transition-all"
               >
                 <div className="aspect-[4/3] overflow-hidden bg-slate-200">
                   <img
@@ -89,7 +93,7 @@ export default function Highlights() {
 
       {activeHighlight && (
         <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-sm p-4 flex items-center justify-center">
-          <div className="w-full max-w-2xl bg-white rounded-2xl overflow-hidden shadow-2xl">
+          <div className="w-full max-w-2xl bg-white rounded-2xl overflow-hidden">
             <div className="relative h-56 bg-slate-200">
               <img
                 src={activeHighlight.image || '/images/placeholder-gallery-1.jpg'}
@@ -123,3 +127,4 @@ export default function Highlights() {
     </section>
   );
 }
+

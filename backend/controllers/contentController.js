@@ -55,11 +55,11 @@ export const joinWaitlist = async (req, res) => {
       const result = await sendWaitlistConfirmationEmail({ email, name, bookTitle });
       emailSent = Boolean(result?.sent);
     } catch (emailError) {
-      console.error('Resend community email error:', emailError);
+      console.error('Resend book waitlist email error:', emailError);
     }
 
     res.status(existing ? 200 : 201).json({
-      message: existing ? "You're already in the community." : "You're in. Welcome to the community.",
+      message: existing ? "You're already on the book waitlist." : "You're on the list. We'll keep you updated about the book.",
       entry,
       emailSent,
     });

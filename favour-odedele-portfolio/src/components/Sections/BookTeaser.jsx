@@ -12,6 +12,23 @@ export default function BookTeaser() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState('');
   const [confirmationMessage, setConfirmationMessage] = useState('');
+  const [confirmationVisible, setConfirmationVisible] = useState(false);
+
+  useEffect(() => {
+    if (!confirmationMessage) {
+      setConfirmationVisible(false);
+      return undefined;
+    }
+
+    setConfirmationVisible(true);
+    const fadeTimer = setTimeout(() => setConfirmationVisible(false), 3500);
+    const clearTimer = setTimeout(() => setConfirmationMessage(''), 4000);
+
+    return () => {
+      clearTimeout(fadeTimer);
+      clearTimeout(clearTimer);
+    };
+  }, [confirmationMessage]);
 
   useEffect(() => {
     let active = true;
@@ -57,20 +74,20 @@ export default function BookTeaser() {
         <div className="grid grid-cols-1 lg:grid-cols-[0.9fr_1.1fr] gap-10 lg:gap-16 items-center">
           <div className="relative mx-auto w-full max-w-sm">
             <div className="absolute -inset-5 rounded-3xl bg-primary/20 blur-2xl" />
-            <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border border-white/10 bg-slate-900 shadow-2xl">
+            <div className="relative aspect-[3/4] rounded-2xl overflow-hidden border border-white/10 bg-slate-900">
               <img src={coverUrl} alt={`${book.title} cover`} className="w-full h-full object-cover" />
               <div className="absolute inset-0 bg-linear-to-t from-slate-950/80 via-transparent to-transparent" />
               <div className="absolute bottom-0 left-0 right-0 p-6">
                 <BookOpen className="w-8 h-8 text-primary mb-4" />
-                <h3 className="text-3xl font-black uppercase leading-tight">{book.title}</h3>
-                <p className="mt-2 text-xs font-bold uppercase tracking-[0.25em] text-white/60">By Favour Odedele</p>
+                <h3 className="text-2xl font-bold uppercase leading-tight">{book.title}</h3>
+                <p className="mt-2 font-name text-2xl leading-none text-white/70">By Favour Odedele</p>
               </div>
             </div>
           </div>
 
           <div>
             <p className="text-accent-magenta font-black tracking-[0.35em] uppercase text-xs mb-5">My Book</p>
-            <h2 className="text-4xl sm:text-5xl lg:text-7xl font-black tracking-tight leading-none">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-normal leading-tight">
               {book.title || 'Becoming the 1%'}
             </h2>
             <p className="mt-8 text-base sm:text-lg leading-relaxed text-slate-300 max-w-2xl">
@@ -117,7 +134,15 @@ export default function BookTeaser() {
               className="w-full px-4 py-3 rounded-xl border border-slate-200 text-slate-900 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
             />
             {submitError && <p className="text-sm text-red-600 font-medium">{submitError}</p>}
-            {confirmationMessage && <p className="text-sm text-emerald-700 font-medium">{confirmationMessage}</p>}
+            {confirmationMessage && (
+              <p
+                className={`text-sm text-emerald-700 font-medium transition-opacity duration-500 ${
+                  confirmationVisible ? 'opacity-100' : 'opacity-0'
+                }`}
+              >
+                {confirmationMessage}
+              </p>
+            )}
             <button
               type="submit"
               disabled={isSubmitting}
@@ -131,4 +156,6 @@ export default function BookTeaser() {
     </section>
   );
 }
+
+
 

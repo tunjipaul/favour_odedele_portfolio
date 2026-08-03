@@ -22,6 +22,7 @@ import GalleryManager from './admin/pages/GalleryManager';
 import SettingsEditor from './admin/pages/SettingsEditor';
 import WaitlistViewer from './admin/pages/WaitlistViewer';
 import FrontPageEditor from './admin/pages/FrontPageEditor';
+import CommunityEditor from './admin/pages/CommunityEditor';
 
 // ProtectedRoute — redirects to /admin/login if not authenticated
 function ProtectedRoute({ children }) {
@@ -53,7 +54,7 @@ export default function App() {
       <Route
         path="/"
         element={
-          <div className="bg-background-light text-slate-900 font-display">
+          <div className="bg-background-light text-slate-900 font-body">
             <Navbar />
             <main>
               <Hero />
@@ -85,6 +86,7 @@ export default function App() {
         <Route path="front-page" element={<FrontPageEditor />} />
 
         <Route path="projects" element={<ProjectsManager />} />
+        <Route path="community" element={<CommunityEditor />} />
         <Route path="waitlist" element={<WaitlistViewer />} />
         <Route path="gallery" element={<GalleryManager />} />
         <Route path="settings" element={<SettingsEditor />} />
@@ -95,6 +97,7 @@ export default function App() {
     </Routes>
   );
 }
+
 
 
 
