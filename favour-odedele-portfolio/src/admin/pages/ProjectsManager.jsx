@@ -321,7 +321,7 @@ export default function ProjectsManager() {
                   <span className="block text-sm font-medium text-gray-700 mb-1">Accent</span>
                   <select value={form.tagColor} onChange={(event) => setForm({ ...form, tagColor: event.target.value })} className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#064E3B]">
                     <option value="primary">Primary</option>
-                    <option value="accent-magenta">Magenta</option>
+                    <option value="accent-magenta">Burgundy</option>
                     <option value="accent-green">Green</option>
                   </select>
                 </label>

@@ -5,7 +5,7 @@ import { API_BASE_URL } from '../../config.js';
 const FALLBACK_NAME = 'FAVOUR ODEDELE';
 const FALLBACK_BIO = 'Author, community builder, and future social entrepreneur writing about education, leadership, entrepreneurship, and personal growth.';
 const FALLBACK_PORTRAIT = '/images/placeholder-hero.jpg';
-const LETTER_COLORS = ['#556b2f', '#1e3a5f', '#7c3aed'];
+const LETTER_COLORS = ['#556b2f', '#1e3a5f', '#800020'];
 
 export default function Hero() {
   const [settings, setSettings] = useState({

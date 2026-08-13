@@ -15,7 +15,7 @@ const TAB_CONFIG = [
 const BADGE_CLASS_BY_ACCENT = {
   primary: 'bg-slate-800 text-white',
   'accent-green': 'bg-emerald-700 text-white',
-  'accent-magenta': 'bg-fuchsia-700 text-white',
+  'accent-magenta': 'bg-[#800020] text-white',
 };
 
 const LABEL_BY_ACCENT = {

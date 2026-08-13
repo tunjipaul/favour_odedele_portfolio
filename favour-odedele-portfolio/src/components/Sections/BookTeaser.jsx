@@ -243,14 +243,14 @@ export default function BookTeaser() {
             </div>
 
             {/* Story text with left editorial accent line and staggered fade-up */}
-            <div className="border-l-2 border-primary/25 pl-4 sm:pl-6 space-y-3.5 max-w-2xl">
+            <div className="border-l-2 border-primary/25 pl-4 sm:pl-6 space-y-3.5 max-w-2xl text-justify [text-align-last:left] [hyphens:auto]">
               {paragraphs.map((paragraph, index) => {
                 const isFirst = index === 0;
                 return (
                   <p
                     key={index}
                     style={{ transitionDelay: `${index * 90 + 150}ms` }}
-                    className={`transition-all duration-700 ease-out text-pretty ${
+                    className={`transition-all duration-700 ease-out text-justify [text-align-last:left] [hyphens:auto] ${
                       isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
                     } ${
                       isFirst
