@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { authApi } from './admin/utils/api';
 import { API_BASE_URL } from './config.js';
@@ -13,16 +13,26 @@ import BookTeaser from './components/Sections/BookTeaser';
 import Gallery from './components/Sections/Gallery';
 import Community from './components/Sections/Community';
 
-// Admin pages
-import AdminLayout from './admin/AdminLayout';
-import Login from './admin/pages/Login';
-import Dashboard from './admin/pages/Dashboard';
-import ProjectsManager from './admin/pages/ProjectsManager';
-import GalleryManager from './admin/pages/GalleryManager';
-import SettingsEditor from './admin/pages/SettingsEditor';
-import WaitlistViewer from './admin/pages/WaitlistViewer';
-import FrontPageEditor from './admin/pages/FrontPageEditor';
-import CommunityEditor from './admin/pages/CommunityEditor';
+// Lazy-loaded Admin pages (reduces public bundle size for SEO & speed)
+const AdminLayout = lazy(() => import('./admin/AdminLayout'));
+const Login = lazy(() => import('./admin/pages/Login'));
+const Dashboard = lazy(() => import('./admin/pages/Dashboard'));
+const ProjectsManager = lazy(() => import('./admin/pages/ProjectsManager'));
+const GalleryManager = lazy(() => import('./admin/pages/GalleryManager'));
+const SettingsEditor = lazy(() => import('./admin/pages/SettingsEditor'));
+const WaitlistViewer = lazy(() => import('./admin/pages/WaitlistViewer'));
+const FrontPageEditor = lazy(() => import('./admin/pages/FrontPageEditor'));
+const CommunityEditor = lazy(() => import('./admin/pages/CommunityEditor'));
+
+// Admin fallback loader
+function AdminLoadingFallback() {
+  return (
+    <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-white gap-3">
+      <div className="w-8 h-8 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+      <p className="text-xs uppercase tracking-widest text-slate-400">Loading admin...</p>
+    </div>
+  );
+}
 
 // ProtectedRoute — redirects to /admin/login if not authenticated
 function ProtectedRoute({ children }) {
@@ -70,26 +80,83 @@ export default function App() {
       />
 
       {/* ── Admin Login (public) ──────────────────── */}
-      <Route path="/admin/login" element={<Login />} />
+      <Route
+        path="/admin/login"
+        element={
+          <Suspense fallback={<AdminLoadingFallback />}>
+            <Login />
+          </Suspense>
+        }
+      />
 
       {/* ── Admin Panel (protected) ───────────────── */}
       <Route
         path="/admin"
         element={
           <ProtectedRoute>
-            <AdminLayout />
+            <Suspense fallback={<AdminLoadingFallback />}>
+              <AdminLayout />
+            </Suspense>
           </ProtectedRoute>
         }
       >
         <Route index element={<Navigate to="/admin/dashboard" replace />} />
-        <Route path="dashboard" element={<Dashboard />} />
-        <Route path="front-page" element={<FrontPageEditor />} />
-
-        <Route path="projects" element={<ProjectsManager />} />
-        <Route path="community" element={<CommunityEditor />} />
-        <Route path="waitlist" element={<WaitlistViewer />} />
-        <Route path="gallery" element={<GalleryManager />} />
-        <Route path="settings" element={<SettingsEditor />} />
+        <Route
+          path="dashboard"
+          element={
+            <Suspense fallback={<AdminLoadingFallback />}>
+              <Dashboard />
+            </Suspense>
+          }
+        />
+        <Route
+          path="front-page"
+          element={
+            <Suspense fallback={<AdminLoadingFallback />}>
+              <FrontPageEditor />
+            </Suspense>
+          }
+        />
+        <Route
+          path="projects"
+          element={
+            <Suspense fallback={<AdminLoadingFallback />}>
+              <ProjectsManager />
+            </Suspense>
+          }
+        />
+        <Route
+          path="community"
+          element={
+            <Suspense fallback={<AdminLoadingFallback />}>
+              <CommunityEditor />
+            </Suspense>
+          }
+        />
+        <Route
+          path="waitlist"
+          element={
+            <Suspense fallback={<AdminLoadingFallback />}>
+              <WaitlistViewer />
+            </Suspense>
+          }
+        />
+        <Route
+          path="gallery"
+          element={
+            <Suspense fallback={<AdminLoadingFallback />}>
+              <GalleryManager />
+            </Suspense>
+          }
+        />
+        <Route
+          path="settings"
+          element={
+            <Suspense fallback={<AdminLoadingFallback />}>
+              <SettingsEditor />
+            </Suspense>
+          }
+        />
       </Route>
 
       {/* ── Catch-all ────────────────────────────── */}

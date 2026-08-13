@@ -67,7 +67,9 @@ export default function Highlights() {
                 <div className="aspect-[4/3] overflow-hidden bg-slate-200">
                   <img
                     src={highlight.image || '/images/placeholder-gallery-1.jpg'}
-                    alt={highlight.title}
+                    alt={highlight.title || 'Favour Odedele Highlight Project'}
+                    loading="lazy"
+                    decoding="async"
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                   />
                 </div>

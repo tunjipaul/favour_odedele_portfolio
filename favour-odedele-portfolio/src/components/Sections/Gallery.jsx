@@ -59,7 +59,9 @@ export default function Gallery() {
 
               <img
                 src={item.image}
-                alt={item.title}
+                alt={item.title || `Favour Odedele Gallery Item ${index + 1}`}
+                loading="lazy"
+                decoding="async"
                 onLoad={() => handleLoad(index)}
                 className={`w-full grayscale group-hover:grayscale-0 transition-all duration-500 ${
                   loaded[index] ? 'opacity-100' : 'opacity-0 absolute inset-0'

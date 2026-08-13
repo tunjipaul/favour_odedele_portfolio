@@ -34,18 +34,18 @@ export default function Navbar() {
     <header className="sticky top-0 z-50 w-full border-b border-primary/10 backdrop-blur-md bg-background-light/90">
       <div className="max-w-7xl mx-auto px-4 lg:px-6 h-16 lg:h-20 flex items-center justify-between gap-4">
         <div className="flex items-center gap-2 shrink-0">
-          <h1 className="font-name text-2xl sm:text-3xl lg:text-4xl leading-none">
+          <span className="font-name text-2xl sm:text-3xl lg:text-4xl leading-none select-none">
             <span className="hidden sm:inline">Favour Odedele</span>
             <span className="sm:hidden">F. Odedele</span>
-          </h1>
+          </span>
         </div>
 
-        <nav className="hidden lg:flex items-center gap-6 xl:gap-10 flex-1 justify-center">
+        <nav className="hidden lg:flex items-center gap-6 xl:gap-10 flex-1 justify-center" aria-label="Main Navigation">
           {navLinks.map((link) => (
             <button
               key={link.label}
               onClick={() => scrollToSection(link.sectionId)}
-              className="text-sm font-semibold hover:text-primary transition-colors whitespace-nowrap"
+              className="text-sm font-semibold hover:text-primary transition-colors whitespace-nowrap cursor-pointer"
             >
               {link.label}
             </button>
@@ -55,7 +55,7 @@ export default function Navbar() {
         <div className="flex items-center gap-2 shrink-0">
           <button
             onClick={() => scrollToSection('contact')}
-            className="hidden lg:inline-flex bg-primary hover:bg-primary-dark text-white px-5 py-2.5 rounded-xl text-sm font-bold transition-all active:scale-95 whitespace-nowrap"
+            className="hidden lg:inline-flex bg-primary hover:bg-primary-dark text-white px-5 py-2.5 rounded-xl text-sm font-bold transition-all active:scale-95 whitespace-nowrap cursor-pointer"
           >
             Contact
           </button>
@@ -63,7 +63,9 @@ export default function Navbar() {
           <button
             onClick={toggleMobileMenu}
             className="lg:hidden text-slate-700 hover:text-primary transition-colors p-2 -mr-1"
-            aria-label="Toggle menu"
+            aria-label={isMobileMenuOpen ? 'Close mobile menu' : 'Open mobile menu'}
+            aria-expanded={isMobileMenuOpen}
+            aria-controls="mobile-navigation"
           >
             {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -72,7 +74,7 @@ export default function Navbar() {
 
       {isMobileMenuOpen && (
         <div className="lg:hidden border-t border-primary/10 bg-background-light/98 backdrop-blur-md">
-          <nav className="flex flex-col px-4 py-3 gap-1 max-w-7xl mx-auto">
+          <nav id="mobile-navigation" aria-label="Mobile Navigation" className="flex flex-col px-4 py-3 gap-1 max-w-7xl mx-auto">
             {navLinks.map((link) => (
               <button
                 key={link.label}

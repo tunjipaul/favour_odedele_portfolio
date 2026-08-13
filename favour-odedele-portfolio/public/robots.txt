@@ -1,0 +1,11 @@
+# Robots.txt for Favour Odedele Portfolio
+# https://favourodedele.com
+
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /admin/*
+Disallow: /api/
+
+# Sitemaps
+Sitemap: https://favourodedele.com/sitemap.xml
