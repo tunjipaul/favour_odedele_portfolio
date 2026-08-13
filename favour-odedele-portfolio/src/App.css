@@ -32,13 +32,14 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
+
 h1,
 h2,
 h3,
 h4,
 .font-display,
 .font-serif {
-  font-family: var(--font-display);
+  font-family: var(--font-body);
 }
 
 p,
@@ -164,6 +165,29 @@ a,
   animation: bookOpen 2s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
 }
 
+/* 3D Realistic Book Styles */
+.book-3d {
+  transition: transform 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.book-3d:hover {
+  transform: translateY(-8px) scale(1.02);
+}
+
+.book-3d:hover .book-cover {
+  box-shadow:
+    0 25px 50px -12px rgba(0, 0, 0, 0.35),
+    0 10px 20px -5px rgba(0, 0, 0, 0.15);
+}
+
+.book-cover {
+  transition: box-shadow 0.5s ease, transform 0.5s ease;
+  box-shadow:
+    0 20px 40px -10px rgba(0, 0, 0, 0.25),
+    0 8px 16px -4px rgba(0, 0, 0, 0.12),
+    -4px 0 8px rgba(0, 0, 0, 0.08);
+}
+
 /* Custom duration utility */
 .duration-2000 {
   transition-duration: 2000ms;
@@ -206,5 +230,8 @@ a,
   border-left: 4px solid #4b5320;
 }
 
-
-
+/* Gallery skeleton shimmer */
+@keyframes skeletonShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}

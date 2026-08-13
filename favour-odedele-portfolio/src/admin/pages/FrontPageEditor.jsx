@@ -291,14 +291,6 @@ export default function FrontPageEditor() {
                     className="w-full rounded-xl border border-white/15 bg-slate-900 px-3 py-2 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-orange-400/60"
                   />
                 </label>
-                <label className="block">
-                  <span className="mb-2 block text-xs sm:text-sm font-semibold text-slate-200">Book badge</span>
-                  <input
-                    value={settings.about.bookBadge}
-                    onChange={(event) => updateAbout('bookBadge', event.target.value)}
-                    className="w-full h-10 sm:h-11 rounded-xl border border-white/15 bg-slate-900 px-3 text-sm text-slate-100 focus:outline-none focus:ring-2 focus:ring-orange-400/60"
-                  />
-                </label>
 
                 <div className="space-y-4 pt-2">
                   <p className="text-xs sm:text-sm font-semibold text-slate-200">Focus areas</p>

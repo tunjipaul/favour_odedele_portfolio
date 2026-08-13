@@ -4,6 +4,7 @@ export const DEFAULT_BOOK_SETTINGS = {
     'A personal book on discipline, identity, excellence, and the quiet decisions that shape who we become.',
   coverUrl: '/images/placeholder-audacity.jpg',
   pdfUrl: '',
+  purchaseUrl: '',
   progress: 0,
   stats: [
     { label: 'Book Notes', target: 1 },

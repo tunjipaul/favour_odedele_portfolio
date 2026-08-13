@@ -11,14 +11,19 @@ const accentColorMap = {
 };
 
 export default function Gallery() {
-  const [galleryItems, setGalleryItems] = useState(fallbackItems); // hardcoded fallback
+  const [galleryItems, setGalleryItems] = useState(fallbackItems);
+  const [loaded, setLoaded] = useState({});
 
   useEffect(() => {
     fetch(`${API}/gallery`)
       .then((res) => res.json())
       .then((data) => { if (Array.isArray(data) && data.length) setGalleryItems(data); })
-      .catch(() => {}); // keep fallback if API fails
+      .catch(() => {});
   }, []);
+
+  const handleLoad = (index) => {
+    setLoaded((prev) => ({ ...prev, [index]: true }));
+  };
 
   return (
     <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-white" id="gallery">
@@ -38,10 +43,27 @@ export default function Gallery() {
               key={item._id || item.id || `${item.title}-${index}`}
               className="masonry-item rounded-lg sm:rounded-xl overflow-hidden group relative"
             >
+              {/* Skeleton placeholder */}
+              {!loaded[index] && (
+                <div className="w-full aspect-[4/3] bg-slate-200 animate-pulse rounded-lg sm:rounded-xl">
+                  <div
+                    className="absolute inset-0 rounded-lg sm:rounded-xl"
+                    style={{
+                      background: 'linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.5) 50%, transparent 100%)',
+                      backgroundSize: '200% 100%',
+                      animation: 'skeletonShimmer 1.5s ease-in-out infinite',
+                    }}
+                  />
+                </div>
+              )}
+
               <img
                 src={item.image}
                 alt={item.title}
-                className="w-full grayscale group-hover:grayscale-0 transition-all duration-500"
+                onLoad={() => handleLoad(index)}
+                className={`w-full grayscale group-hover:grayscale-0 transition-all duration-500 ${
+                  loaded[index] ? 'opacity-100' : 'opacity-0 absolute inset-0'
+                }`}
               />
               <div
                 className={`absolute inset-0 ${accentColorMap[item.accentColor] || 'bg-primary/40'} opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center p-4`}

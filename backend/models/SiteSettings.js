@@ -68,6 +68,7 @@ const siteSettingsSchema = new mongoose.Schema(
       teaser: { type: String, default: 'A personal book on discipline, identity, excellence, and the quiet decisions that shape who we become.' },
       coverUrl: { type: String, default: '' },
       pdfUrl: { type: String, default: '' },
+      purchaseUrl: { type: String, default: '' },
       progress: { type: Number, default: 70 }, // Percentage complete
       stats: [
         {

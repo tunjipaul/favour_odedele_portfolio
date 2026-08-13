@@ -95,7 +95,7 @@ export default function Hero() {
 
   return (
     <section className="relative w-full bg-[#948a66] overflow-hidden">
-      <div className="lg:hidden flex flex-col min-h-screen">
+      <div className="lg:hidden flex flex-col">
         <div className="bg-background-dark px-6 py-4 flex items-center justify-between">
           <div className="w-9 h-9 border-2 border-white flex items-center justify-center font-black text-lg text-white">F</div>
           <div className="flex gap-3">
@@ -106,18 +106,18 @@ export default function Hero() {
         <div className="relative w-full h-[55vw] min-h-[260px] max-h-[420px] overflow-hidden">
           <img src={settings.portrait} alt={settings.fullName} className="w-full h-full object-cover object-top max-lg:grayscale-0 lg:grayscale lg:hover:grayscale-0 transition-all duration-700" />
           <div className="absolute inset-0 bg-linear-to-t from-[#948a66]/80 via-transparent to-transparent" />
-          <h1 className="absolute bottom-2 left-4 font-name leading-[0.88] flex flex-col" style={{ fontSize: 'clamp(2.5rem, 12vw, 5rem)' }}>
+          <h1 className="absolute bottom-2 left-4 font-name font-bold leading-[0.88] flex flex-col" style={{ fontSize: 'clamp(2.5rem, 12vw, 5rem)' }}>
             <span className="flex">{renderNameLine(firstName, 0)}</span>
             <span className="flex">{renderNameLine(lastName, firstName.length + 1)}</span>
           </h1>
         </div>
-        <div className="bg-[#948a66] px-6 py-8 flex flex-col gap-4">
+        <div className="bg-[#948a66] px-6 pt-5 pb-8 flex flex-col gap-4">
           <p className="text-white text-sm font-medium leading-relaxed max-w-sm">{settings.bioText}</p>
           <div className="flex gap-3 flex-wrap">
-            <button onClick={() => scrollToSection('community')} className="inline-flex items-center gap-2 bg-white text-background-dark px-5 py-2 text-xs font-bold uppercase tracking-widest hover:bg-accent-magenta hover:text-white transition-all duration-300">
+            <button onClick={() => scrollToSection('community')} className="inline-flex items-center gap-2 bg-white text-background-dark px-5 py-2.5 text-xs font-bold uppercase tracking-widest hover:bg-accent-magenta hover:text-white transition-all duration-300 rounded-lg shadow-sm">
               <Users className="w-4 h-4" /> Join Community
             </button>
-            <button onClick={() => scrollToSection('book')} className="inline-flex items-center gap-2 border border-white/60 text-white px-5 py-2 text-xs font-bold uppercase tracking-widest hover:bg-white/10 transition-all duration-300">
+            <button onClick={() => scrollToSection('book')} className="inline-flex items-center gap-2 border border-white/60 text-white px-5 py-2.5 text-xs font-bold uppercase tracking-widest hover:bg-white/10 transition-all duration-300 rounded-lg">
               <BookOpen className="w-4 h-4" /> Book Updates
             </button>
           </div>
@@ -142,7 +142,7 @@ export default function Hero() {
 
           <section className="flex-1 relative flex items-center overflow-hidden">
             <div className="absolute left-[-5%] z-30 pointer-events-none w-full">
-              <h1 className="font-name flex flex-col leading-[0.88]" style={{ fontSize: 'clamp(3rem, 8vw, 7rem)' }}>
+              <h1 className="font-name font-bold flex flex-col leading-[0.88]" style={{ fontSize: 'clamp(3rem, 8vw, 7rem)' }}>
                 <span className="flex">{renderNameLine(firstName, 0)}</span>
                 <span className="flex">{renderNameLine(lastName, firstName.length + 1)}</span>
               </h1>

@@ -153,6 +153,18 @@ export default function WaitlistViewer() {
               </div>
             </div>
 
+            <div>
+              <label className="block text-xs sm:text-sm text-slate-300 mb-2">Book Purchase Link</label>
+              <p className="text-[11px] text-slate-500 mb-2">Paste the URL where people can buy the book (e.g. Selar, Amazon, Gumroad). This powers the "Get Book" button.</p>
+              <input
+                type="url"
+                value={book.purchaseUrl || ''}
+                onChange={(event) => updateBookField('purchaseUrl', event.target.value)}
+                placeholder="https://selar.co/your-book"
+                className="w-full bg-slate-900/70 border border-white/15 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+              />
+            </div>
+
             <button
               type="submit"
               disabled={savingBook}

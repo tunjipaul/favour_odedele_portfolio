@@ -24,6 +24,7 @@ export default function AboutMe() {
   return (
     <section className="py-16 sm:py-20 lg:py-28 bg-white" id="about">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        {/* Two-column: heading + paragraphs */}
         <div className="grid grid-cols-1 lg:grid-cols-[0.9fr_1.1fr] gap-10 lg:gap-16 items-start">
           <div>
             <p className="text-accent-magenta font-bold tracking-widest uppercase text-xs sm:text-sm mb-4">
@@ -37,25 +38,26 @@ export default function AboutMe() {
           <div className="space-y-6 text-slate-600 text-base sm:text-lg leading-relaxed">
             <p>{about.paragraph1}</p>
             <p>{about.paragraph2}</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 pt-4">
-              {about.focusAreas.map((item, index) => {
-                const Icon = FOCUS_ICONS[index] || Users;
-                return (
-                  <div key={`${item.title}-${index}`} className="min-w-0 border border-slate-200 bg-background-muted p-5 rounded-xl">
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 text-primary flex items-center justify-center mb-4">
-                      <Icon className="w-5 h-5" />
-                    </div>
-                    <h3 className="font-black text-slate-950 mb-2 break-words">{item.title}</h3>
-                    <p className="text-sm leading-relaxed text-slate-500 break-words [overflow-wrap:anywhere]">{item.description}</p>
-                  </div>
-                );
-              })}
-            </div>
-            <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2 text-sm font-semibold text-slate-700">
-              <BookOpen className="w-4 h-4 text-accent-magenta" />
-              {about.bookBadge}
-            </div>
           </div>
+        </div>
+
+        {/* Full-width focus area cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mt-14">
+          {about.focusAreas.map((item, index) => {
+            const Icon = FOCUS_ICONS[index] || Users;
+            return (
+              <div
+                key={`${item.title}-${index}`}
+                className="flex flex-col min-w-0 border border-slate-200 bg-background-muted p-6 rounded-2xl transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:border-slate-300"
+              >
+                <div className="w-11 h-11 rounded-xl bg-primary/10 text-primary flex items-center justify-center mb-5">
+                  <Icon className="w-5 h-5" />
+                </div>
+                <h3 className="font-black text-slate-950 text-lg mb-2 break-words">{item.title}</h3>
+                <p className="text-sm leading-relaxed text-slate-500 break-words [overflow-wrap:anywhere]">{item.description}</p>
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>

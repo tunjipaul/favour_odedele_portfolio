@@ -101,40 +101,41 @@ export default function Footer() {
             </div>
           )}
 
-          <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-3 sm:gap-4 md:gap-6">
+          <div className="grid grid-cols-2 sm:flex sm:flex-row sm:flex-wrap justify-center gap-2.5 sm:gap-4 md:gap-6 max-w-sm sm:max-w-none mx-auto">
             <a
               href={mailHref}
-              className="flex items-center justify-center gap-3 px-6 sm:px-8 py-3 sm:py-4 bg-slate-900 text-white rounded-2xl hover:scale-105 transition-all"
+              className="flex items-center justify-center gap-2 sm:gap-3 px-4 sm:px-8 py-3 sm:py-4 bg-slate-900 text-white rounded-xl sm:rounded-2xl hover:scale-105 transition-all text-xs sm:text-base shadow-sm"
             >
-              <Mail className="w-5 h-5" />
-              <span className="font-bold">Email Me</span>
+              <Mail className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
+              <span className="font-bold truncate">Email Me</span>
             </a>
             <a
               href={linkedInHref}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-3 px-6 sm:px-8 py-3 sm:py-4 bg-primary text-white rounded-2xl hover:scale-105 transition-all"
+              className="flex items-center justify-center gap-2 sm:gap-3 px-4 sm:px-8 py-3 sm:py-4 bg-primary text-white rounded-xl sm:rounded-2xl hover:scale-105 transition-all text-xs sm:text-base shadow-sm"
             >
-              <Linkedin className="w-5 h-5" />
-              <span className="font-bold">LinkedIn</span>
+              <Linkedin className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
+              <span className="font-bold truncate">LinkedIn</span>
             </a>
             <a
               href={bookCallHref}
-              className="flex items-center justify-center gap-3 px-6 sm:px-8 py-3 sm:py-4 bg-accent-magenta text-white rounded-2xl hover:scale-105 transition-all"
+              className="flex items-center justify-center gap-2 sm:gap-3 px-4 sm:px-8 py-3 sm:py-4 bg-accent-magenta text-white rounded-xl sm:rounded-2xl hover:scale-105 transition-all text-xs sm:text-base shadow-sm"
             >
-              <CalendarDays className="w-5 h-5" />
-              <span className="font-bold">Call</span>
+              <CalendarDays className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
+              <span className="font-bold truncate">Call</span>
             </a>
             <a
               href={twitterHref}
               target="_blank"
               rel="noopener noreferrer"
               aria-label="X"
-              className="flex items-center justify-center gap-3 px-6 sm:px-8 py-3 sm:py-4 bg-slate-700 text-white rounded-2xl hover:scale-105 transition-all"
+              className="flex items-center justify-center gap-2 sm:gap-3 px-4 sm:px-8 py-3 sm:py-4 bg-slate-700 text-white rounded-xl sm:rounded-2xl hover:scale-105 transition-all text-xs sm:text-base shadow-sm"
             >
-              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <svg className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                 <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.746l7.73-8.835L1.254 2.25H8.08l4.259 5.63 5.905-5.63zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
               </svg>
+              <span className="font-bold">X</span>
             </a>
           </div>
         </div>
