@@ -1,6 +1,10 @@
 @import "./styles/fonts.css";
 @import "tailwindcss";
 
+html {
+  scroll-behavior: smooth;
+}
+
 @theme {
   --color-primary: #556b2f;
   --color-primary-dark: #4a5d28;
