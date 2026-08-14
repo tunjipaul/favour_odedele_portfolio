@@ -58,6 +58,22 @@ export default function App() {
     return () => clearInterval(interval);
   }, []);
 
+  // Scroll to hash target on initial load (e.g. /#book)
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (!hash) return;
+
+    // Small delay to let React finish rendering all sections
+    const timer = setTimeout(() => {
+      const element = document.querySelector(hash);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth' });
+      }
+    }, 600);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <Routes>
       {/* ── Public Portfolio ─────────────────────── */}
