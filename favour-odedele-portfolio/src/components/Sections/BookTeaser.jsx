@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { BookOpen, Download, Mail, Sparkles } from 'lucide-react';
 import useStore from '../../store/useStore';
 import Modal from '../UI/Modal';
@@ -95,12 +96,14 @@ export default function BookTeaser() {
     <section ref={sectionRef} className="py-16 sm:py-20 lg:py-28 bg-white overflow-hidden" id="book">
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-1 lg:grid-cols-[0.9fr_1.1fr] gap-10 lg:gap-16 items-center">
-          {/* ── 3D Realistic Book ── */}
-          <div
-            className={`relative mx-auto w-full max-w-xs flex items-center justify-center transition-all duration-1000 ease-out ${
+          {/* ── 3D Realistic Book (links to dedicated page) ── */}
+          <Link
+            to="/book"
+            className={`relative mx-auto w-full max-w-xs flex items-center justify-center transition-all duration-1000 ease-out cursor-pointer group ${
               isVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-8 scale-95'
             }`}
             style={{ perspective: '1200px' }}
+            aria-label={`View ${book.title || 'book'} details`}
           >
             {/* Soft ambient glow behind the book */}
             <div className="absolute -inset-8 rounded-full bg-primary/10 blur-3xl" />
@@ -224,7 +227,11 @@ export default function BookTeaser() {
                 }}
               />
             </div>
-          </div>
+            {/* Hover hint */}
+            <span className="absolute -bottom-10 left-1/2 -translate-x-1/2 text-xs text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+              View book page →
+            </span>
+          </Link>
 
           {/* ── Book Info / Author's Note ── */}
           <div className="space-y-6">
@@ -271,19 +278,12 @@ export default function BookTeaser() {
                 isVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
               }`}
             >
-              <a
-                href={book.purchaseUrl || book.pdfUrl || '#'}
-                target={book.purchaseUrl || book.pdfUrl ? '_blank' : undefined}
-                rel={book.purchaseUrl || book.pdfUrl ? 'noreferrer' : undefined}
-                aria-disabled={!book.purchaseUrl && !book.pdfUrl}
-                className={`inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-black uppercase tracking-widest transition shadow-sm hover:shadow-md ${
-                  book.purchaseUrl || book.pdfUrl
-                    ? 'bg-slate-900 text-white hover:bg-slate-700 hover:text-slate-100 active:scale-[0.98]'
-                    : 'bg-slate-100 text-slate-400 pointer-events-none'
-                }`}
+              <Link
+                to="/book"
+                className="inline-flex items-center justify-center gap-2 rounded-xl px-6 py-3 text-sm font-black uppercase tracking-widest transition shadow-sm hover:shadow-md bg-slate-900 text-white hover:bg-slate-700 hover:text-slate-100 active:scale-[0.98]"
               >
                 <Download className="w-4 h-4" /> Get Book
-              </a>
+              </Link>
               <button
                 type="button"
                 onClick={toggleWaitlist}

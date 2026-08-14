@@ -13,6 +13,9 @@ import BookTeaser from './components/Sections/BookTeaser';
 import Gallery from './components/Sections/Gallery';
 import Community from './components/Sections/Community';
 
+// Lazy-loaded public pages
+const BookPage = lazy(() => import('./components/Pages/BookPage'));
+
 // Lazy-loaded Admin pages (reduces public bundle size for SEO & speed)
 const AdminLayout = lazy(() => import('./admin/AdminLayout'));
 const Login = lazy(() => import('./admin/pages/Login'));
@@ -92,6 +95,21 @@ export default function App() {
             </main>
             <Footer />
           </div>
+        }
+      />
+
+      {/* ── Dedicated Book Page ────────────────────── */}
+      <Route
+        path="/book"
+        element={
+          <Suspense fallback={
+            <div className="min-h-screen bg-[#0c0f0a] flex flex-col items-center justify-center text-white gap-3">
+              <div className="w-8 h-8 border-2 border-amber-500 border-t-transparent rounded-full animate-spin" />
+              <p className="text-xs uppercase tracking-widest text-white/40">Loading...</p>
+            </div>
+          }>
+            <BookPage />
+          </Suspense>
         }
       />
 
