@@ -104,11 +104,21 @@ export default function WaitlistViewer() {
               />
             </div>
             <div>
-              <label className="block text-xs sm:text-sm text-slate-300 mb-2">Short Description</label>
+              <label className="block text-xs sm:text-sm text-slate-300 mb-2">Short Description / Teaser</label>
               <textarea
                 rows={4}
                 value={book.teaser || ''}
                 onChange={(event) => updateBookField('teaser', event.target.value)}
+                className="w-full bg-slate-900/70 border border-white/15 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+              />
+            </div>
+            <div>
+              <label className="block text-xs sm:text-sm text-slate-300 mb-2">Book Quote / Pull Quote</label>
+              <textarea
+                rows={3}
+                value={book.quote || ''}
+                onChange={(event) => updateBookField('quote', event.target.value)}
+                placeholder="Enter a quote or excerpt from the book"
                 className="w-full bg-slate-900/70 border border-white/15 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
               />
             </div>

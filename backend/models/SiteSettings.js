@@ -66,6 +66,10 @@ const siteSettingsSchema = new mongoose.Schema(
     book: {
       title: { type: String, default: 'Becoming the 1%' },
       teaser: { type: String, default: 'A personal book on discipline, identity, excellence, and the quiet decisions that shape who we become.' },
+      quote: {
+        type: String,
+        default: 'This book is not about perfection. It’s about the quiet, consistent decisions that separate the few who become from the many who remain.',
+      },
       coverUrl: { type: String, default: '' },
       pdfUrl: { type: String, default: '' },
       purchaseUrl: { type: String, default: '' },

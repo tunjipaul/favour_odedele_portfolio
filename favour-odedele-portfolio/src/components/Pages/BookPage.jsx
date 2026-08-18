@@ -325,25 +325,29 @@ export default function BookPage() {
         </div>
       </section>
 
-      {/* ── Decorative Divider ── */}
-      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="h-px bg-gradient-to-r from-transparent via-[#800020]/15 to-transparent" />
-      </div>
-
       {/* ── Quote / Pull Section ── */}
-      <section className="relative z-10 px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24">
-        <div className="max-w-3xl mx-auto text-center">
-          <Quote className="w-10 h-10 text-[#800020]/20 mx-auto mb-6" />
-          <blockquote className="text-xl sm:text-2xl lg:text-3xl font-medium leading-relaxed text-gray-600 italic">
-            &ldquo;This book is not about perfection. It&rsquo;s about the quiet, consistent decisions that separate the few who become from the many who remain.&rdquo;
-          </blockquote>
-          <div className="mt-6 flex items-center justify-center gap-3">
-            <div className="w-8 h-px bg-[#800020]/30" />
-            <p className="text-sm text-[#800020]/60 tracking-[0.2em] uppercase font-medium">Favour Odedele</p>
-            <div className="w-8 h-px bg-[#800020]/30" />
+      {(book.quote || DEFAULT_BOOK_SETTINGS.quote) && (
+        <>
+          {/* ── Decorative Divider ── */}
+          <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="h-px bg-gradient-to-r from-transparent via-[#800020]/15 to-transparent" />
           </div>
-        </div>
-      </section>
+
+          <section className="relative z-10 px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24">
+            <div className="max-w-3xl mx-auto text-center">
+              <Quote className="w-10 h-10 text-[#800020]/20 mx-auto mb-6" />
+              <blockquote className="text-xl sm:text-2xl lg:text-3xl font-medium leading-relaxed text-gray-600 italic">
+                &ldquo;{book.quote || DEFAULT_BOOK_SETTINGS.quote}&rdquo;
+              </blockquote>
+              <div className="mt-6 flex items-center justify-center gap-3">
+                <div className="w-8 h-px bg-[#800020]/30" />
+                <p className="text-sm text-[#800020]/60 tracking-[0.2em] uppercase font-medium">Favour Odedele</p>
+                <div className="w-8 h-px bg-[#800020]/30" />
+              </div>
+            </div>
+          </section>
+        </>
+      )}
 
       {/* ── Footer ── */}
       <footer className="relative z-10 px-4 sm:px-6 lg:px-8 py-8 border-t border-gray-100">
