@@ -7,6 +7,7 @@ export const DEFAULT_BOOK_SETTINGS = {
   coverUrl: '/images/placeholder-audacity.jpg',
   pdfUrl: '',
   purchaseUrl: '',
+  whatsappUrl: 'https://chat.whatsapp.com/KynBTrAHf4YBIuPcyAkAb0?mode=gi_t',
   progress: 0,
   stats: [
     { label: 'Book Notes', target: 1 },

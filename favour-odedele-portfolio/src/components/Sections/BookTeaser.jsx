@@ -79,7 +79,11 @@ export default function BookTeaser() {
       const data = await response.json().catch(() => ({}));
       if (!response.ok) throw new Error(data.message || 'Something went wrong.');
       setEmail('');
-      setConfirmationMessage(data.message || 'You are on the list.');
+      setConfirmationMessage('You are on the list! Redirecting you to our WhatsApp community...');
+      const targetUrl = data.whatsappUrl || book.whatsappUrl || 'https://chat.whatsapp.com/KynBTrAHf4YBIuPcyAkAb0?mode=gi_t';
+      setTimeout(() => {
+        window.location.href = targetUrl;
+      }, 1200);
     } catch (error) {
       setSubmitError(error.message || 'Something went wrong.');
     } finally {

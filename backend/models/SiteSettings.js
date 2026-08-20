@@ -73,6 +73,10 @@ const siteSettingsSchema = new mongoose.Schema(
       coverUrl: { type: String, default: '' },
       pdfUrl: { type: String, default: '' },
       purchaseUrl: { type: String, default: '' },
+      whatsappUrl: {
+        type: String,
+        default: 'https://chat.whatsapp.com/KynBTrAHf4YBIuPcyAkAb0?mode=gi_t',
+      },
       progress: { type: Number, default: 70 }, // Percentage complete
       stats: [
         {

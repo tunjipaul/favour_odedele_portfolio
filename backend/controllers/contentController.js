@@ -44,6 +44,7 @@ export const joinWaitlist = async (req, res) => {
     const existing = await WaitlistEntry.findOne({ email });
     const settings = await SiteSettings.findOne();
     const bookTitle = settings?.book?.title || 'Becoming the 1%';
+    const whatsappUrl = settings?.book?.whatsappUrl || 'https://chat.whatsapp.com/KynBTrAHf4YBIuPcyAkAb0?mode=gi_t';
 
     let entry = existing;
     if (!existing) {
@@ -52,7 +53,7 @@ export const joinWaitlist = async (req, res) => {
 
     let emailSent = false;
     try {
-      const result = await sendWaitlistConfirmationEmail({ email, name, bookTitle });
+      const result = await sendWaitlistConfirmationEmail({ email, name, bookTitle, whatsappUrl });
       emailSent = Boolean(result?.sent);
     } catch (emailError) {
       console.error('Resend book waitlist email error:', emailError);
@@ -62,6 +63,7 @@ export const joinWaitlist = async (req, res) => {
       message: existing ? "You're already on the book waitlist." : "You're on the list. We'll keep you updated about the book.",
       entry,
       emailSent,
+      whatsappUrl,
     });
   } catch (error) {
     console.error('ContentController.joinWaitlist error:', error);

@@ -175,6 +175,18 @@ export default function WaitlistViewer() {
               />
             </div>
 
+            <div>
+              <label className="block text-xs sm:text-sm text-slate-300 mb-2">WhatsApp Community Link</label>
+              <p className="text-[11px] text-slate-500 mb-2">Users who submit their email on the waitlist will be redirected here and receive this link in their confirmation email.</p>
+              <input
+                type="url"
+                value={book.whatsappUrl || ''}
+                onChange={(event) => updateBookField('whatsappUrl', event.target.value)}
+                placeholder="https://chat.whatsapp.com/..."
+                className="w-full bg-slate-900/70 border border-white/15 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+              />
+            </div>
+
             <button
               type="submit"
               disabled={savingBook}
