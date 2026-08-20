@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { api } from '../utils/api';
-import { Upload } from 'lucide-react';
+import { Upload, Download, Copy, Check, Search, FileSpreadsheet } from 'lucide-react';
 import { DEFAULT_BOOK_SETTINGS, normalizeBookSettings } from '../../data/bookSettings.js';
 
 const formatDate = (iso) =>
@@ -13,12 +13,54 @@ export default function WaitlistViewer() {
   const [savingBook, setSavingBook] = useState(false);
   const [uploadingCover, setUploadingCover] = useState(false);
   const [uploadingPdf, setUploadingPdf] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [copiedAll, setCopiedAll] = useState(false);
+  const [copiedId, setCopiedId] = useState(null);
   const [msg, setMsg] = useState('');
 
   const flash = (text) => {
     setMsg(text);
     setTimeout(() => setMsg(''), 3000);
   };
+
+  const exportToCSV = () => {
+    if (entries.length === 0) return;
+    const header = 'Email,Sign-up Date\n';
+    const rows = entries
+      .map((entry) => `"${entry.email}","${new Date(entry.createdAt).toISOString()}"`)
+      .join('\n');
+    const blob = new Blob([header + rows], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.setAttribute('href', url);
+    link.setAttribute('download', `favour-book-waitlist-${new Date().toISOString().slice(0, 10)}.csv`);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    flash('Waitlist exported to CSV!');
+  };
+
+  const copyAllEmails = () => {
+    if (entries.length === 0) return;
+    const emailList = entries.map((e) => e.email).join(', ');
+    navigator.clipboard.writeText(emailList);
+    setCopiedAll(true);
+    flash(`Copied ${entries.length} emails to clipboard!`);
+    setTimeout(() => setCopiedAll(false), 2500);
+  };
+
+  const copySingleEmail = (email, id) => {
+    navigator.clipboard.writeText(email);
+    setCopiedId(id);
+    flash(`Copied ${email}`);
+    setTimeout(() => setCopiedId(null), 2000);
+  };
+
+  const filteredEntries = useMemo(() => {
+    if (!searchQuery.trim()) return entries;
+    const q = searchQuery.toLowerCase();
+    return entries.filter((e) => e.email?.toLowerCase().includes(q));
+  }, [entries, searchQuery]);
 
   useEffect(() => {
     const load = async () => {
@@ -197,36 +239,95 @@ export default function WaitlistViewer() {
           </form>
         </section>
 
-        <section className="bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-6">
-          <div className="mb-4 sm:mb-5">
-            <p className="text-[10px] sm:text-xs uppercase tracking-[0.3em] sm:tracking-[0.4em] text-slate-400">Book waitlist</p>
-            <h2 className="text-lg sm:text-xl font-semibold">{entries.length} signups</h2>
+        <section className="bg-white/5 border border-white/10 rounded-2xl p-4 sm:p-6 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <p className="text-[10px] sm:text-xs uppercase tracking-[0.3em] sm:tracking-[0.4em] text-slate-400">Book waitlist</p>
+              <h2 className="text-lg sm:text-xl font-semibold">{entries.length} {entries.length === 1 ? 'signup' : 'signups'}</h2>
+            </div>
+
+            {entries.length > 0 && (
+              <div className="flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={copyAllEmails}
+                  className="inline-flex items-center gap-1.5 px-3 py-2 rounded-lg bg-white/10 hover:bg-white/15 text-xs font-semibold text-white transition-colors cursor-pointer"
+                  title="Copy all emails to clipboard (comma separated)"
+                >
+                  {copiedAll ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                  <span>{copiedAll ? 'Copied All!' : 'Copy All Emails'}</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={exportToCSV}
+                  className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-xs font-bold text-white transition-colors cursor-pointer shadow-sm"
+                  title="Download waitlist as CSV file"
+                >
+                  <FileSpreadsheet className="w-3.5 h-3.5" />
+                  <span>Export CSV</span>
+                </button>
+              </div>
+            )}
           </div>
 
+          {entries.length > 0 && (
+            <div className="relative">
+              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search emails..."
+                className="w-full bg-slate-900/70 border border-white/10 rounded-lg pl-9 pr-3 py-2 text-xs sm:text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500/40"
+              />
+            </div>
+          )}
+
           {loading ? (
-            <div className="text-xs sm:text-sm text-slate-400">Loading...</div>
+            <div className="text-xs sm:text-sm text-slate-400 py-6 text-center">Loading waitlist...</div>
           ) : entries.length === 0 ? (
-            <p className="text-xs sm:text-sm text-slate-500">No book waitlist signups yet.</p>
+            <p className="text-xs sm:text-sm text-slate-500 py-6 text-center">No book waitlist signups yet.</p>
+          ) : filteredEntries.length === 0 ? (
+            <p className="text-xs sm:text-sm text-slate-500 py-6 text-center">No emails match &ldquo;{searchQuery}&rdquo;</p>
           ) : (
-            <div className="overflow-x-auto">
+            <div className="overflow-x-auto rounded-xl border border-white/5">
               <table className="w-full text-left text-xs sm:text-sm">
                 <thead className="text-slate-400 text-[10px] sm:text-xs uppercase tracking-[0.3em] sm:tracking-[0.35em] bg-slate-950/40">
                   <tr>
-                    <th className="px-3 sm:px-4 py-2 sm:py-3 whitespace-nowrap">Email</th>
-                    <th className="px-3 sm:px-4 py-2 sm:py-3 whitespace-nowrap hidden sm:table-cell">Sign-up date</th>
+                    <th className="px-3 sm:px-4 py-2.5 sm:py-3 whitespace-nowrap">Email</th>
+                    <th className="px-3 sm:px-4 py-2.5 sm:py-3 whitespace-nowrap hidden sm:table-cell">Sign-up date</th>
+                    <th className="px-3 sm:px-4 py-2.5 sm:py-3 whitespace-nowrap text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-white/5">
-                  {entries.map((entry, index) => (
-                    <tr key={entry._id ?? index} className="hover:bg-white/5 transition-colors">
-                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-slate-300 lowercase text-xs sm:text-sm">
-                        <a href={`mailto:${entry.email}`} className="hover:text-white break-all">
-                          {entry.email}
-                        </a>
-                      </td>
-                      <td className="px-3 sm:px-4 py-2 sm:py-3 text-slate-400 text-xs sm:text-sm hidden sm:table-cell whitespace-nowrap">{formatDate(entry.createdAt)}</td>
-                    </tr>
-                  ))}
+                  {filteredEntries.map((entry, index) => {
+                    const id = entry._id ?? index;
+                    const isCopied = copiedId === id;
+                    return (
+                      <tr key={id} className="hover:bg-white/5 transition-colors">
+                        <td className="px-3 sm:px-4 py-2.5 sm:py-3 text-slate-300 lowercase text-xs sm:text-sm font-medium">
+                          <a href={`mailto:${entry.email}`} className="hover:text-white break-all">
+                            {entry.email}
+                          </a>
+                        </td>
+                        <td className="px-3 sm:px-4 py-2.5 sm:py-3 text-slate-400 text-xs sm:text-sm hidden sm:table-cell whitespace-nowrap">
+                          {formatDate(entry.createdAt)}
+                        </td>
+                        <td className="px-3 sm:px-4 py-2.5 sm:py-3 text-right">
+                          <button
+                            type="button"
+                            onClick={() => copySingleEmail(entry.email, id)}
+                            className="inline-flex items-center gap-1 px-2.5 py-1 rounded bg-white/5 hover:bg-white/10 text-[11px] text-slate-300 hover:text-white transition-colors cursor-pointer"
+                            title="Copy email"
+                          >
+                            {isCopied ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                            <span>{isCopied ? 'Copied' : 'Copy'}</span>
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </table>
             </div>

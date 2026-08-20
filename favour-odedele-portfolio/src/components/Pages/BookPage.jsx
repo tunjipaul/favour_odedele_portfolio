@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
-import { Download, ArrowLeft, Sparkles, BookOpen, Quote } from 'lucide-react';
+import { Download, ArrowLeft, Sparkles, BookOpen, Quote, Mail } from 'lucide-react';
 import { API_BASE_URL } from '../../config.js';
 import { DEFAULT_BOOK_SETTINGS, normalizeBookSettings } from '../../data/bookSettings.js';
+import Modal from '../UI/Modal';
 
 /* ───────────────────────── Floating Particles ───────────────────────── */
 function FloatingParticles() {
@@ -68,6 +69,12 @@ export default function BookPage() {
   const [book, setBook] = useState(DEFAULT_BOOK_SETTINGS);
   const [coverLoaded, setCoverLoaded] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [isWaitlistOpen, setIsWaitlistOpen] = useState(false);
+  const [email, setEmail] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState('');
+  const [confirmationMessage, setConfirmationMessage] = useState('');
+  const [confirmationVisible, setConfirmationVisible] = useState(false);
   const heroRef = useRef(null);
 
   // Fetch book data from backend
@@ -89,6 +96,48 @@ export default function BookPage() {
     const timer = setTimeout(() => setIsVisible(true), 150);
     return () => clearTimeout(timer);
   }, []);
+
+  // Confirmation auto-dismiss
+  useEffect(() => {
+    if (!confirmationMessage) {
+      setConfirmationVisible(false);
+      return undefined;
+    }
+    setConfirmationVisible(true);
+    const fadeTimer = setTimeout(() => setConfirmationVisible(false), 3500);
+    const clearTimer = setTimeout(() => setConfirmationMessage(''), 4000);
+    return () => {
+      clearTimeout(fadeTimer);
+      clearTimeout(clearTimer);
+    };
+  }, [confirmationMessage]);
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setIsSubmitting(true);
+    setSubmitError('');
+    setConfirmationMessage('');
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/waitlist`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok) throw new Error(data.message || 'Something went wrong.');
+      setEmail('');
+      setConfirmationMessage('You are on the list! Redirecting you to our WhatsApp community...');
+      const targetUrl = data.whatsappUrl || book.whatsappUrl || 'https://chat.whatsapp.com/KynBTrAHf4YBIuPcyAkAb0?mode=gi_t';
+      setTimeout(() => {
+        window.location.href = targetUrl;
+      }, 1200);
+    } catch (error) {
+      setSubmitError(error.message || 'Something went wrong.');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   const coverUrl = book.coverUrl || '/images/placeholder-audacity.jpg';
   const paragraphs = useMemo(
@@ -319,6 +368,14 @@ export default function BookPage() {
                   <Download className="w-4 h-4" />
                   {hasDownloadLink ? 'Get the Book' : 'Coming Soon'}
                 </a>
+                <button
+                  type="button"
+                  onClick={() => setIsWaitlistOpen(true)}
+                  className="inline-flex items-center justify-center gap-2.5 rounded-xl px-8 py-3.5 text-sm font-black uppercase tracking-[0.2em] text-[#800020] border border-[#800020]/20 bg-[#800020]/5 hover:bg-[#800020]/10 hover:border-[#800020]/30 active:scale-[0.97] transition-all cursor-pointer"
+                >
+                  <Mail className="w-4 h-4" />
+                  Join the waitlist
+                </button>
               </div>
             </div>
           </div>
@@ -363,6 +420,42 @@ export default function BookPage() {
           </Link>
         </div>
       </footer>
+
+      {/* ── Waitlist Modal ── */}
+      <Modal isOpen={isWaitlistOpen} onClose={() => setIsWaitlistOpen(false)} title="Get book updates">
+        <div className="space-y-6">
+          <p className="text-slate-600 leading-relaxed text-sm">
+            Be the first to know when <strong className="text-slate-900">{book.title}</strong> is available and receive early updates from Favour.
+          </p>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <input
+              type="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              placeholder="Enter your email address"
+              required
+              className="w-full px-4 py-3 rounded-xl border border-slate-200 text-slate-900 focus:outline-none focus:ring-2 focus:ring-[#800020]/30 focus:border-[#800020] text-sm"
+            />
+            {submitError && <p className="text-sm text-red-600 font-medium">{submitError}</p>}
+            {confirmationMessage && (
+              <p
+                className={`text-sm text-emerald-700 font-medium transition-opacity duration-500 ${
+                  confirmationVisible ? 'opacity-100' : 'opacity-0'
+                }`}
+              >
+                {confirmationMessage}
+              </p>
+            )}
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full bg-gradient-to-r from-[#800020] to-[#a0002a] hover:from-[#9a0028] hover:to-[#b30030] disabled:opacity-60 disabled:cursor-not-allowed text-white py-3 rounded-xl font-bold text-sm uppercase tracking-widest transition-all cursor-pointer shadow-md"
+            >
+              {isSubmitting ? 'Submitting...' : 'Notify Me'}
+            </button>
+          </form>
+        </div>
+      </Modal>
     </div>
   );
 }
